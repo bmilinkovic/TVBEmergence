@@ -1,1 +1,3 @@
-simstvb/
+.DS_Store
+.gitignore
+results/
