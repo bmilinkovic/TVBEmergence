@@ -12,9 +12,9 @@ addParameter(p, 'morder', defaultMorder);
 
 parse(p, X, varargin{:});
 
-X = p.Results.X
-morder = p.Results.morder
-regmode = p.Results.regmode
+X = p.Results.X;
+morder = p.Results.morder;
+regmode = p.Results.regmode;
 
 % The actual analysis
 [VAR.A, VAR.V] = tsdata_to_var(X, morder, regmode);

@@ -12,7 +12,6 @@ defaultNobs = 1000;
 p = inputParser;
 
 addRequired(p, 'dimension');
-addRequired(
 addParameter(p, 'morder', defaultMorder);
 addParameter(p, 'rho', defaultRho);
 addParameter(p, 'w', defaultW);
