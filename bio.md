@@ -34,4 +34,4 @@ neuroscience, psychology, computer science, philosophy, art and medicine.
 I am always happy to connect with other interested in similar topics, or even those that have productive critiques, so please
 reach out if you want to get in touch! 
 
-Happy browsing, friends.
+H
