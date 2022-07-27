@@ -3,7 +3,7 @@ emergenceDir = fileparts(mfilename('fullpath'));
 addpath(emergenceDir);
 
 addpath(fullfile(emergenceDir, 'deprecated'));
-addpath(genpath(fullfile(emergenceDir, 'mvgcfuncs')));
+addpath(genpath(fullfile(emergenceDir, 'networks')));
 addpath(fullfile(emergenceDir, 'results'));
 addpath(fullfile(emergenceDir, 'simulation'));
 addpath(fullfile(emergenceDir, 'utils'));
