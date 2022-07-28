@@ -11,7 +11,11 @@ import matplotlib.pyplot as plt
 
 import utils.pyutils.connMatrixPlotter
 # from src.networks.subset9Modular36 import subnet9mod36
-
+'''
+Preparation of results directory
+'''
+resultsDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/data'
+figureDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/figures'
 
 
 # connectivity
@@ -109,12 +113,13 @@ axs[0].plot(data_cleaned[0])
 axs[1].plot(data_cleaned[1])
 axs[2].plot(data_cleaned[2])
 axs[3].plot(data_cleaned[3])
+plt.savefig(os.path.join(figureDir,'SJ3D-node-5-paramsweep-gc.svg'))
+plt.show()
 
 
 # saving data file.
-resultsDir = '../results/data'
-sio.savemat(os.path.join(resultsDir, 'SJ3D-node-5-paramsweep-gc.mat', {"data": data_cleaned})
 
+sio.savemat(os.path.join(resultsDir, 'SJ3D-node-5-paramsweep-gc.mat'), {"data": data_cleaned})
 
 
 
