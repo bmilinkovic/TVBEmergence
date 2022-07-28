@@ -3,6 +3,8 @@ import random
 from tvb.simulator.lab import *
 from scipy.stats import zscore
 import scipy.io as sio
+import pandas as pd
+import os
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -87,13 +89,6 @@ def run_sim(global_coupling):
 #         data_cleaned[i] = zscore(np.sum(data[500:,0,i,:], axis=1))
 #     return data_cleaned.T
 
-
-
-
-
-
-
-
 gc_range = np.arange(0.0, .2, .05)
 # the below could be used for a parameter sweep across three different paramers. these are lists to iterate over for
 # tract lengths as well as noise. However, for this a new run_sim function needs to be created to accomodated for
@@ -116,6 +111,9 @@ axs[2].plot(data_cleaned[2])
 axs[3].plot(data_cleaned[3])
 
 
+# saving data file.
+resultsDir = '../results/data'
+sio.savemat(os.path.join(resultsDir, 'SJ3D-node-5-paramsweep-gc.mat', {"data": data_cleaned})
 
 
 
