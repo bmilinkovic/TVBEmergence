@@ -11,13 +11,15 @@ import matplotlib.pyplot as plt
 
 import utils.pyutils.connMatrixPlotter
 # from src.networks.subset9Modular36 import subnet9mod36
+
+# %%
 '''
 Preparation of results directory
 '''
 resultsDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/data'
 figureDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/figures'
 
-
+# %%
 # connectivity
 default = connectivity.Connectivity.from_file()
 default.configure()
@@ -43,6 +45,8 @@ subset_nodelay = connectivity.Connectivity(weights=changedWeights,
                                            centres=default.centres[idx],
                                            region_labels=default.region_labels[idx])
 subset_nodelay.configure()
+
+# %%
 
 # configure monitors
 monitors = monitors.SubSample(period=1.953125)
@@ -92,6 +96,7 @@ def run_sim(global_coupling):
 #     for i in range(len(changedWeights)):
 #         data_cleaned[i] = zscore(np.sum(data[500:,0,i,:], axis=1))
 #     return data_cleaned.T
+# %%
 
 gc_range = np.arange(0.0, .2, .05)
 # the below could be used for a parameter sweep across three different paramers. these are lists to iterate over for
@@ -106,6 +111,7 @@ data_cleaned = []
 for gc in gc_range:
     data_cleaned.append(run_sim(np.array([gc])))
 
+# %%
 # plot data
 fig, axs = plt.subplots(4)
 fig.suptitle("5-node network across Global Coupling range")
@@ -117,6 +123,7 @@ plt.savefig(os.path.join(figureDir,'SJ3D-node-5-paramsweep-gc.svg'))
 plt.show()
 
 
+# %%
 # saving data file.
 
 sio.savemat(os.path.join(resultsDir, 'SJ3D-node-5-paramsweep-gc.mat'), {"data": data_cleaned})
