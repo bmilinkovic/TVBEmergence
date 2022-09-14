@@ -2,17 +2,19 @@ from tvb.simulator.lab import *
 import numpy as np
 import matplotlib.pyplot as plt
 import utils.pyutils.connMatrixPlotter
-from src.networks.subset9Modular36 import subnet9mod36
+from networks.pynetworks.subset9Modular36 import subnet9mod36
+import time
+import scipy.io as sio
 
 ### Saving figures setup ###
 ### if we want to not save, just set save = False ###
-figureDir = "../results/figures/"
+figureDir = "/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/figures/"
 savefig = True
 ###########################
 
 ### Saving results setup ###
 ### if we want to not save, just set savemat = False ###
-dataDir = "../results/data/"
+dataDir = "/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/data/"
 resultsmat = True
 ###########################
 conn = subnet9mod36()
@@ -35,7 +37,7 @@ def run_sim(global_coupling):
     print("Starting Gen2dOscillator simulation with coupling factor " + str(global_coupling))
     results = simulation.run()
     data = results[0][1].squeeze()
-    return (global_coupling, data, time)
+    return (global_coupling, data)
 
 # running a parameter sweep of the global coupling parameter
 gc_range = np.arange(0.0, 5.1, .50)
@@ -47,22 +49,18 @@ for gc in gc_range:
 f1 = plt.figure()
 utils.pyutils.connMatrixPlotter.connMatrixPlotter(conn)
 plt.show()
-#
-# f2 = plt.figure(figsize=(21, 8))
-# gs = f2.add_gridspec(1, 2)
-# ax1 = f2.add_subplot(gs[0, 0])
-# ax1.set_title('subset of 6')
-# plt.plot(time, data[:, 4:])
-# ax2 = f2.add_subplot(gs[0, 1])
-# ax2.set_title('subset of 3')
-# plt.plot(time,data[:,:3])
-# plt.show()
 
 
-# if savefig:
-#     plt.savefig(figureDir + "figure{}".format() + ".png", dpi=600, bbox_inches='tight')
-#
-# if resultsmat:
-#     sio.savemat(dataDir + "results{}".format() + ".mat", {'data':data})
 
+if resultsmat:
+    if os.path.exists(dataDir + 'oscSim.mat'):
+        sio.savemat(dataDir + 'oscSim_{}.mat'.format(int(time.time())), {'data': data[0][1]})
+    else:
+        sio.savemat(dataDir + 'oscSim.mat', {'data': data[0][1]})
+
+if savefig:
+    if os.path.exists(figureDir + 'oscFig.png'):
+        sio.savemat(figureDir + 'oscFig_{}.png'.format(int(time.time())))
+    else:
+        sio.savemat(figureDir + 'oscFig.png')
 

@@ -126,7 +126,7 @@ plt.show()
 # %%
 # saving data file.
 
-sio.savemat(os.path.join(resultsDir, 'SJ3D-node-5-paramsweep-gc.mat'), {"data": data_cleaned})
+sio.savemat(os.path.join(resultsDir, 'SJ3D-node-5-gcoup.mat'), {"data": data_cleaned})
 
 
 
