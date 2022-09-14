@@ -57,6 +57,9 @@ plt.show()
 # This below needs some work.
 
 
+# SAVING DATA FOR MVGC USE
+
+
 if resultsmat:
 for i in range(len(data)):
     if os.path.exists(dataDir + 'oscSim.mat'):
