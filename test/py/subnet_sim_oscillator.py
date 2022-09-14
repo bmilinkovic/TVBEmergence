@@ -17,6 +17,8 @@ savefig = True
 dataDir = "/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/data/"
 resultsmat = True
 ###########################
+
+
 conn = subnet9mod36()
 monitors = simulator.monitors.SubSample(period=1.953125)
 monitors.configure()
@@ -46,21 +48,25 @@ for gc in gc_range:
     data.append((run_sim(np.array([gc]))))
 
 #plot connectivity
-f1 = plt.figure()
+
+plt.figure()
 utils.pyutils.connMatrixPlotter.connMatrixPlotter(conn)
+f1 = plt.gcf()
 plt.show()
 
+# This below needs some work.
 
 
 if resultsmat:
+for i in range(len(data)):
     if os.path.exists(dataDir + 'oscSim.mat'):
-        sio.savemat(dataDir + 'oscSim_{}.mat'.format(int(time.time())), {'data': data[0][1]})
-    else:
-        sio.savemat(dataDir + 'oscSim.mat', {'data': data[0][1]})
+        sio.savemat(dataDir + 'oscSim_{0}_{1}.mat'.format(i, int(time.time())), {'data': data[i][1]})
+
+
 
 if savefig:
     if os.path.exists(figureDir + 'oscFig.png'):
-        sio.savemat(figureDir + 'oscFig_{}.png'.format(int(time.time())))
+        plt.savefig(figureDir + 'oscFig_{}.png'.format(int(time.time())))
     else:
-        sio.savemat(figureDir + 'oscFig.png')
+        plt.savefig(figureDir + 'oscFig.png')
 
