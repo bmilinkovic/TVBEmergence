@@ -53,45 +53,38 @@ simulation = simulator.Simulator(connectivity=surrogate_connectivity,
 simulation.configure()
 
 
-def run_sim(global_coupling, noise):
+def run_sim(global_coupling, noise, conduction_speed):
     simulation.coupling.a = global_coupling
     simulation.integrator.noise.nsig = noise
-    print("Starting Generic2dOscillator simulation with coupling factor " + str(global_coupling))
+    simulation.conduction_speed = conduction_speed
+    print("Starting Generic2dOscillator simulation with coupling factor: " + str(global_coupling) + " noise: " + str(noise) + " and conduction speed: " + str(conduction_speed))
     results = simulation.run()
     time = results[0][0].squeeze()
     data = results[0][1].squeeze()
-    return (global_coupling, time, data)
-
-# gc_range = np.arange(0.35, 0.7, .03)
-# data = []
-# for gc in gc_range:
-#     data.append((run_sim(np.array([gc]))))
-
-
-
+    return (global_coupling, conduction_speed, noise,  data)
 
 global_coupling = np.r_[0.3:0.7:0.1]
 noise = np.r_[0:0.04:0.01]
-conduction_speed = np.r_[0:20:5]
+conduction_speed = np.r_[0:21:5]
 
-for (ai, bi) in list(product(*[global_coupling, noise])):
-    run_sim(np.array([ai]), np.array([bi]))
-
-
-
+data = []
+for (ai, bi, ci) in list(product(*[global_coupling, noise, conduction_speed])):
+    data.append(run_sim(np.array([ai]), np.array([bi]), ci))
 
 
-# fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/figures/osc2d_3node/oscPlot_{0:02d}.png'
-# for i in range(len(data)):
-#     fig, ax = plt.subplots()
-#     ax.set_title('3 Coupled Generic3dOscillators with Global Coupling = ' + str(data[i][0]))
-#     ax.set_xlabel('Time (ms)')
-#     ax.set_ylabel('Oscillatory activity')
-#     ax.plot(data[i][2])
-#     ax.legend(['DLPFC', 'IPSc', 'V1'], loc='upper right')
-#     plt.savefig(fileNameTemplate.format(i), format='png')
-#     plt.clf()
-#
+
+
+fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/figures/osc2d_3node/oscPlot_{0:02d}.png'
+for i in range(len(data)):
+    fig, ax = plt.subplots()
+    ax.set_title('3 Coupled Generic3dOscillators with GC = {0} CS = {1} Noise = {2}'.format(str(data[i][0]), str(data[i][1]), str(data[i][2])))
+    ax.set_xlabel('Time (ms)')
+    ax.set_ylabel('Oscillatory activity')
+    ax.plot(data[i][3])
+    ax.legend(['DLPFC', 'IPSc', 'V1'], loc='upper right')
+    plt.savefig(fileNameTemplate.format(i), format='png')
+    plt.clf()
+
 # for i in range(len(data)):
 #     if os.path.exists(dataDir + 'osc2d_3node_0.mat'):
 #         sio.savemat(dataDir + 'osc2d_3node_{0}_{1}.mat'.format(i, int(time.time())), {'data': data[i][2]})
@@ -99,3 +92,10 @@ for (ai, bi) in list(product(*[global_coupling, noise])):
 #         sio.savemat(dataDir + 'osc2d_3node_0.mat', {'data': data[i][2]})
 
 
+
+
+# Code for single parameter sweep
+# gc_range = np.arange(0.35, 0.7, .03)
+# data = []
+# for gc in gc_range:
+#     data.append((run_sim(np.array([gc]))))
