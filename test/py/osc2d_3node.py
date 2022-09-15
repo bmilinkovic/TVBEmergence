@@ -12,6 +12,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from itertools import product
+
 # Set the directories for saving figures and data
 figureDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/figures/osc2d_3node/'
 dataDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/data/osc2d_3node/'
@@ -50,9 +52,50 @@ simulation = simulator.Simulator(connectivity=surrogate_connectivity,
                                  )
 simulation.configure()
 
-results = simulation.run()
-time = results[0][0].squeeze()
-data = results[0][1].squeeze()
 
+def run_sim(global_coupling, noise):
+    simulation.coupling.a = global_coupling
+    simulation.integrator.noise.nsig = noise
+    print("Starting Generic2dOscillator simulation with coupling factor " + str(global_coupling))
+    results = simulation.run()
+    time = results[0][0].squeeze()
+    data = results[0][1].squeeze()
+    return (global_coupling, time, data)
+
+# gc_range = np.arange(0.35, 0.7, .03)
+# data = []
+# for gc in gc_range:
+#     data.append((run_sim(np.array([gc]))))
+
+
+
+
+global_coupling = np.r_[0.3:0.7:0.1]
+noise = np.r_[0:0.04:0.01]
+conduction_speed = np.r_[0:20:5]
+
+for (ai, bi) in list(product(*[global_coupling, noise])):
+    run_sim(np.array([ai]), np.array([bi]))
+
+
+
+
+
+# fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/figures/osc2d_3node/oscPlot_{0:02d}.png'
+# for i in range(len(data)):
+#     fig, ax = plt.subplots()
+#     ax.set_title('3 Coupled Generic3dOscillators with Global Coupling = ' + str(data[i][0]))
+#     ax.set_xlabel('Time (ms)')
+#     ax.set_ylabel('Oscillatory activity')
+#     ax.plot(data[i][2])
+#     ax.legend(['DLPFC', 'IPSc', 'V1'], loc='upper right')
+#     plt.savefig(fileNameTemplate.format(i), format='png')
+#     plt.clf()
+#
+# for i in range(len(data)):
+#     if os.path.exists(dataDir + 'osc2d_3node_0.mat'):
+#         sio.savemat(dataDir + 'osc2d_3node_{0}_{1}.mat'.format(i, int(time.time())), {'data': data[i][2]})
+#     else:
+#         sio.savemat(dataDir + 'osc2d_3node_0.mat', {'data': data[i][2]})
 
 
