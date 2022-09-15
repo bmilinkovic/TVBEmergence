@@ -4,7 +4,7 @@ import tvb.simulator.plot.plotter
 from tvb.simulator.lab import *
 import numpy as np
 import matplotlib.pyplot as plt
-import utils.pyutils.connMatrixPlotter
+from utils.pyutils.connMatrixPlotter import connMatrixPlotter
 from networks.pynetworks.subset9Modular36 import subnet9mod36
 import time
 import scipy.io as sio
@@ -25,31 +25,6 @@ resultsmat = True
 conn = subnet9mod36()
 monitors = simulator.monitors.SubSample(period=.9765625) # subsampling at 256Hz or every 3.90625 ms
 monitors.configure()
-
-
-# practice simulation for oscilatory dynamics
-
-# simulation = simulator.Simulator(connectivity=connectivity.Connectivity.from_file(),
-#                                   coupling=coupling.Linear(),
-#                                   integrator=integrators.HeunStochastic(dt=0.5,
-#                                                                         noise=noise.Additive(nsig=np.array([0.01]))),
-#                                   model=models.Generic2dOscillator(a=np.array([2.2]), b=np.array([-1.0]),
-#                                                                    c=np.array([0.0]),
-#                                                                    d=np.array([0.1]), I=np.array([0.0]),
-#                                                                    alpha=np.array([1.0]),
-#                                                                    beta=np.array([0.2]), gamma=np.array([-1.0]),
-#                                                                    e=np.array([0.0]),
-#                                                                    g=np.array([1.0]), f=np.array([0.333]),
-#                                                                    tau=np.array([1.25])),
-#                                   monitors=[monitors],
-#                                   simulation_length=1000
-#                                   )
-# simulation.configure()
-#
-# test_results = simulation.run()
-#
-# test_time = test_results[0][0].squeeze()
-# test_data = test_results[0][1].squeeze()
 
 
 
@@ -76,7 +51,7 @@ def run_sim(global_coupling):
     return (global_coupling, time_line, data)
 
 # running a parameter sweep of the global coupling parameter
-gc_range = np.arange(0.0, 1.0, .1)
+gc_range = np.arange(0.35, 0.7, .03)
 data = []
 for gc in gc_range:
     data.append((run_sim(np.array([gc]))))
@@ -97,6 +72,10 @@ def compute_corr(time_line, data_result, sim):
     FC[:,:] = np.corrcoef(data_result.T)
     return FC
 
+uidx = np.tril_indices(76,1)
+sim_FC = np.arctanh(FC)[uidx]
+
+
 time_line = data[0][1]
 for i in range(len(data)):
     FC = compute_corr(time_line, data[i][2], simulation)
@@ -108,17 +87,11 @@ for i in range(len(data)):
                 cbar_kws={"shrink":.5}, xticklabels=simulation.connectivity.region_labels, yticklabels=simulation.connectivity.region_labels)
     plt.show()
 
-# sns.clustermap(FC, cmap=cmap, )
-# plt.show()
-#
-# sns.clustermap(FC, cmap=cmap, metric="correlation")
-# plt.show()
 
 
-# plt.figure()
-# utils.pyutils.connMatrixPlotter.connMatrixPlotter(conn)
-# f1 = plt.gcf()
-# plt.show()
+plt.figure(1)
+connMatrixPlotter.connMatrixPlotter(conn)
+plt.show()
 
 
 # UNDER CONSTRUCTION - PLOTTING TIMESERIES PROPERLY
