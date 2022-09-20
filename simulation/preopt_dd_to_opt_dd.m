@@ -50,7 +50,7 @@ fprintf('\n*** loading pre-optimisation results from ''%s''... ',poptfile);
 load(poptfile);
 fprintf('done\n\n');
 
-n = size(V0,1);
+n = size(Vss,1);
 m = mdim;
 fres = size(H,3)-1;
 
@@ -67,12 +67,12 @@ L0o = Lp(:,:,uidx);
 % Multiple optimisation runs
 
 st = tic;
-[dopto,Lo,convp,iopto,sopto,cputo,ohisto] = opt_gd_dds_mruns(H,L0o,nrunso,niterso,sig0o,gdlso,gdtolo,histo,ppo);
+[dopto,Lo,convp,iopto,sopto,cputo,ohisto] = opt_gd_dds_mruns(H,L0o,niterso,sig0o,gdlso,gdtolo,histo,ppo);
 et = toc(st);
 
 % Inverse-transform Lo back for un-decorrelated residuals
 
-Lopto = transform_proj(Lo,V0);
+Lopto = transform_proj(Lo,Vss);
 
 fprintf('\noptimal dynamical dependence =\n'); disp(dopto');
 fprintf('Simulation time = %s\n\n',datestr(seconds(et),'HH:MM:SS.FFF'));

@@ -1,0 +1,29 @@
+X = randn([5000,2]);
+V = randn([5000,1]);
+
+% since the above simulated dynamics are random they should be very low
+downwardcausation = EmergenceDelta(X,V);
+statghost = EmergenceGamma(X,V);
+causalemergence = EmergencePsi(X,V);
+
+% now lets set some correlation between the two.
+
+X1 = randn([5000,2]);
+V1 = 3.4*X1 + 5;
+downwardcausation1 = EmergenceDelta(X1,V1);
+statghost1 = EmergenceGamma(X1,V1);
+causalemergence1 = EmergencePsi(X1,V1);
+
+V = randn([size(V,1), 2]); % multivariate macro
+
+%% Discrete example
+T = 50000;
+X = zeros([T,2]);
+
+for t=2:T
+    X(t,1) = xor(X(t-1,1),X(t-1,2));
+    X(t,2) = rand < 0.5;
+end
+V = xor(X(:,1),X(:,2));
+
+[psi, vmi, xmi] = EmergencePsi(X,V);

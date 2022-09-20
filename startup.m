@@ -4,10 +4,12 @@ addpath(emergenceDir);
 
 addpath(fullfile(emergenceDir, 'deprecated'));
 addpath(genpath(fullfile(emergenceDir, 'networks')));
-addpath(fullfile(emergenceDir, 'results'));
+addpath(genpath(fullfile(emergenceDir, 'results')));
 addpath(fullfile(emergenceDir, 'simulation'));
 addpath(fullfile(emergenceDir, 'utils'));
 addpath(fullfile(emergenceDir, 'test'));
+addpath(fullfile(emergenceDir, 'test/matlab'));
+
 
 ssdi_path = getenv('SSDIDIR');
 assert(exist(ssdi_path,'dir') == 7,'bad SSDI path: ''%s'' does not exist or is not a directory',ssdi_path);

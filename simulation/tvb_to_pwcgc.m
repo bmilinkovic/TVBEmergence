@@ -6,10 +6,11 @@
 %  Loading in a dataset that has been saved as a .mat file from the TVB
 %  simulation
 
-data_dir = '/Users/borjanmilinkovic/PycharmProjects/tvb/results/data';
+data_dir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/data/osc2d_3node_nodelay';
+data_file = 'osc2d_3node_0_1663592068.mat'
 
 %  Here set the datafile name to whichever file you wish to analyse. 
-load([data_dir filesep 'simulationData2.mat']); 
+load([data_dir filesep data_file]); 
 
 data = data'; % transpose data
 
@@ -17,7 +18,7 @@ data = data'; % transpose data
 
 if ~exist('momax',      'var'), momax       = 20; end       % maximum model order
 if ~exist('moregmode',  'var'), moregmode   = 'LWR'; end    % model order regression mode 
-if ~exist('mosel',      'var'), mosel       = 'AIC'; end    % which model order to select
+if ~exist('mosel',      'var'), mosel       = 'BIC'; end    % which model order to select
 if ~exist('plotm',      'var'), plotm       = 0; end        % for plotting on seperate figures
 
 %% VAR MODELLING
@@ -124,6 +125,20 @@ if ~exist('model_name',     'var'), model_name      = 'gc_model'; end
 eweight = F/nanmax(F(:)); % normalising eweights (can be done in networkx as well)
 gfile = fullfile(modelviz_dir, model_name);
 wgraph2dot(nvars,eweight,gfile,[],gvprog,gvdisp);
+
+%% Model Details
+r = morder
+n = size(data,1)
+
+mdescript = sprintf('%d-variable ISS(%d)',n,r);
+
+fprintf('--------------------------------------------\n');
+fprintf('Model                : %s\n',mdescript);
+fprintf('--------------------------------------------\n');
+fprintf('Dimension            : %d\n',n);
+fprintf('Complexity (CAK)     : %d x %d x %d\n',size(CAK,1),size(CAK,2),size(CAK,3));
+fprintf('Frequency resolution : %d\n',size(H,3)-1);
+fprintf('--------------------------------------------\n\n');
 
 %% SAVE PWCGC MODEL
 
