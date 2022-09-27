@@ -22,8 +22,12 @@ dataDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/data/os
 
 surrogate_connectivity = connectivity.Connectivity(number_of_regions=3,
                                                    number_of_connections=9,
-                                                   weights=np.array([[0, 15, 0], [0, 0, 0], [0, 15, 0]]),
-                                                   tract_lengths=np.array([[0, 10, 0], [10, 0, 3], [0, 3, 0]]),
+                                                   weights=np.array([[0, 1, 0],
+                                                                     [1, 0, 0],
+                                                                     [0, 0, 0]]),
+                                                   tract_lengths=np.array([[0, 10, 0],
+                                                                           [10, 0, 3],
+                                                                           [0, 3, 0]]),
                                                    region_labels=np.array(['DLPFC', 'IPSc', 'v1']),
                                                    centres=np.array([[0, 0, 0], [1, 1, 1]])
                                                    )
@@ -34,7 +38,7 @@ output_setting = simulator.monitors.SubSample(period=3.90625)
 output_setting.configure()
 simulation = simulator.Simulator(connectivity=surrogate_connectivity,
                                  coupling=coupling.Linear(),
-                                 integrator=integrators.HeunStochastic(dt=0.5, noise=noise.Additive(nsig=np.array([0.01]))),
+                                 integrator=integrators.HeunStochastic(dt=0.5, noise=noise.Additive()),
                                  model=models.Generic2dOscillator(a=np.array([2.2]),
                                                                   b=np.array([-1.0]),
                                                                   c=np.array([0.0]),
@@ -42,7 +46,7 @@ simulation = simulator.Simulator(connectivity=surrogate_connectivity,
                                                                   I=np.array([0.0]),
                                                                   alpha=np.array([1.0]),
                                                                   beta=np.array([0.2]),
-                                                                  gamma=np.array([-1.0]),
+                                                                  gamma=np.array([1.0]),
                                                                   e=np.array([0.0]),
                                                                   g=np.array([1.0]),
                                                                   f=np.array([0.333]),
@@ -63,12 +67,14 @@ def run_sim(global_coupling, noise, conduction_speed):
     data = results[0][1].squeeze()
     return (global_coupling, conduction_speed, noise,  data)
 
-global_coupling = np.r_[0.3:0.7:0.1]
-noise = np.r_[0:0.04:0.01]
+#global_coupling = np.r_[0.3:0.7:0.1]
+global_coupling_log = 10**np.r_[-5:0:20j]
+#noise = np.r_[0:0.04:0.01]
+noise_log = 10**np.r_[-6:-2:20j]
 conduction_speed = np.r_[0:21:5]
 
 data = []
-for (ai, bi, ci) in list(product(*[global_coupling, noise, conduction_speed])):
+for (ai, bi, ci) in list(product(*[global_coupling_log, noise_log, conduction_speed])):
     data.append(run_sim(np.array([ai]), np.array([bi]), ci))
 
 fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/figures/osc2d_3node/oscPlot_{0:02d}.png'

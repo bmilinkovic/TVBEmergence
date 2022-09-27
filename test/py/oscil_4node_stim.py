@@ -12,17 +12,17 @@ from tvb.simulator.lab import *
 
 # %%
 # Setting results and figure directories
-resultsDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/data'
-figureDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/figures'
+resultsDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/stimulation/data'
+figureDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/stimulation/figures'
 
 # %% Defining the stimulus
 
 # setting connectivity
 # set surrogate connectivity as a 'chain' on a spherical surface.
-wm = connectivity.Connectivity()
-wm.generate_surrogate_connectivity(4, motif='chain', undirected=False, these_centres='spherical')
+conn = connectivity.Connectivity()
+conn.generate_surrogate_connectivity(4, motif='chain', undirected=False, these_centres='spherical')
 
-plot_matrix(wm.weights, connectivity=wm)
+plot_matrix(conn.weights, connectivity=conn)
 plt.show()
 
 # set weighting of stimulus coming into each node.
@@ -30,18 +30,18 @@ weighting = np.zeros((4,))
 weighting[[0,1,2,3]] = 0.8
 
 eqn_t = equations.PulseTrain()
-eqn_t.parameters['onset'] = 1.5e3
-eqn_t.parameters['T'] = 500.0
-eqn_t.parameters['tau'] = 50.0
+eqn_t.parameters['onset'] = 2.5e3
+eqn_t.parameters['T'] = 2000.0
+eqn_t.parameters['tau'] = 100.0
 
 # combine the spatial and temporal components into a StimuliRegion object
 stimulus = patterns.StimuliRegion(
     temporal=eqn_t,
-    connectivity=wm,
+    connectivity=conn,
     weight=weighting)
 
 # configure space and time of stimulus and plot it.
-stimulus.configure_time(np.arange(0., 3e3, 2**-4 ))
+stimulus.configure_time(np.arange(0., 10e3, 2**-4))
 stimulus.configure_space()
 
 plot_pattern(stimulus)
@@ -49,17 +49,17 @@ plt.show()
 
 # %%
 
-sim = simulator.Simulator(
-    model=models.Generic2dOscillator(),
-    connectivity=wm,
-    coupling=coupling.Linear(a=np.array([0.6])),
-    integrator=integrators.HeunStochastic(dt=0.5, noise=noise.Additive(nsig=np.array([5e-2]))),
-    monitors=(
-        monitors.TemporalAverage(period=1.0),
-        ),
-    stimulus=stimulus,
-    simulation_length=5e3, # 1 minute simulation
-).configure()
+ss_output_setting = simulator.monitors.TemporalAverage(period=3.90625)
+ss_output_setting.configure()
+
+sim = simulator.Simulator(model=models.Generic2dOscillator(),
+                          connectivity=conn,
+                          coupling=coupling.Linear(a=np.array([0.6])),
+                          integrator=integrators.HeunStochastic(dt=0.5, noise=noise.Additive(nsig=np.array([2**-4]))),
+                          monitors=(ss_output_setting,),
+                          stimulus=stimulus,
+                          simulation_length=2000*57, # 2s of 56 trials minute simulation
+                          ).configure()
 
 (tavg_time, tavg_data),  = sim.run()
 
