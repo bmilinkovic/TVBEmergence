@@ -50,7 +50,7 @@ fprintf('\n*** loading pre-optimisation results from ''%s''... ',poptfile);
 load(poptfile);
 fprintf('done\n\n');
 
-n = size(Vss,1);
+n = size(V,1);
 m = mdim;
 fres = size(H,3)-1;
 
@@ -102,6 +102,14 @@ for k = 1:size(Lopto,3)
 	nweight(:,k) = 1-gmetricsx(Lopto(:,:,k));
 end
 
+% distances from each subset to the n-macro 
+
+dist = 1 - gmetricsxx(Lopto(:,:,1));
+plucker_dist = plucker(Lopto(:,:,1), true);
+gptitle = sprintf('Distances of Macro-Variable from Subset of MicroVariables');
+gpstem = fullfile(tempdir, 'opt_dist');
+gp_plucker(plucker_dist,3,2,gptitle,gpstem, gpterm, gpscale, gpfsize, gpplot)
+
 clear n m st et tcpu gpplot gpterm gpscale gpfsize gptitle gpstem
 
 if histo
@@ -116,3 +124,5 @@ fprintf('done\n\n');
 % !!! Now remember to convert Lo back to non-decorrelated coordinates !!!
 
 k = 1; wgraph2dot(nweight(:,k),eweight,gfile,[],gvprog);
+
+

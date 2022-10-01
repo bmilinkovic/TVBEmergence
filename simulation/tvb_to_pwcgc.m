@@ -6,13 +6,14 @@
 %  Loading in a dataset that has been saved as a .mat file from the TVB
 %  simulation
 
-data_dir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/data/osc2d_3node_nodelay';
-data_file = 'osc2d_3node_0_1663592068.mat'
+data_dir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/osc2d_3node_nodelay_a-0.5_ps_gc-noise/data';
+data_file = 'osc2d_3node_nodelay_gc-0.545559_noise-0.002336.mat'
 
 %  Here set the datafile name to whichever file you wish to analyse. 
 load([data_dir filesep data_file]); 
 
 data = data'; % transpose data
+data = data(:, 251:end) % get rid of the initial transience by splicing the first second of data. 
 
 %% SETTING VAR MODELLING PARAMETERS
 

@@ -15,16 +15,24 @@ import seaborn as sns
 from itertools import product
 
 # Set the directories for saving figures and data
-figureDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/osc2d_3node_nodelay_ps_gc-noise/figures/'
-dataDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/osc2d_3node_nodelay_ps_gc-noise/data/'
+resultsDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/'
+dataDir = os.path.join(resultsDir, 'osc2d_3node_UNCOUPLED_nodelay_a-1.0_ps_gc-noise/data/')
+figureDir = os.path.join(resultsDir, 'osc2d_3node_UNCOUPLED_nodelay_a-1.0_ps_gc-noise/figures/')
+
+
+if not os.path.exists(figureDir):
+   os.makedirs(figureDir)
+
+if not os.path.exists(dataDir):
+    os.makedirs(dataDir)
 
 # Create simulation
 
 surrogate_connectivity = connectivity.Connectivity(number_of_regions=3,
                                                    number_of_connections=9,
                                                    speed=np.array([sys.float_info.max]),
-                                                   weights=np.array([[0, 1, 0],
-                                                                     [1, 0, 0],
+                                                   weights=np.array([[0, 0, 0],
+                                                                     [0, 0, 0],
                                                                      [0, 0, 0]]),
                                                    tract_lengths=np.array([[0, 0, 0],
                                                                            [0, 0, 0],
@@ -42,7 +50,7 @@ ss_output_setting.configure()
 simulation = simulator.Simulator(connectivity=surrogate_connectivity,
                                  coupling=coupling.Linear(),
                                  integrator=integrators.HeunStochastic(dt=0.5, noise=noise.Additive()),
-                                 model=models.Generic2dOscillator(a=np.array([0.5]),
+                                 model=models.Generic2dOscillator(a=np.array([1.0]),
                                                                   b=np.array([-1.0]),
                                                                   c=np.array([0.0]),
                                                                   d=np.array([0.1]),
@@ -66,7 +74,8 @@ def run_sim(global_coupling, noise):
     results = simulation.run()
     time = results[0][0].squeeze()
     data = results[0][1].squeeze()
-    return (global_coupling, noise, data)
+    return (global_coupling, noise, data, time)
+
 
 #global_coupling = np.r_[0.3:0.7:0.1]
 global_coupling_log = 10**np.r_[-5:0:20j]
@@ -83,21 +92,29 @@ for (ai, bi) in list(product(*[global_coupling_log, noise_log])):
 # for gc in global_coupling:
 #     data.append((run_sim(np.array([gc]))))
 
-# Saving the data files
+# # Saving the data files
 for i in range(len(data)):
         sio.savemat(dataDir + 'osc2d_3node_nodelay_gc-{0:02f}_noise-{1:02f}.mat'.format(float(data[i][0]), float(data[i][1])), {'data': data[i][2]})
 
 
-fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/osc2d_3node_nodelay_ps_gc-noise/figures/osc2d_3node_nodelay_gc-{0:02f}_noise-{1:02f}.svg'
+fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/osc2d_3node_UNCOUPLED_nodelay_a-1.0_ps_gc-noise/figures/osc2d_3node_nodelay_gc-{0:02f}_noise-{1:02f}.svg'
 for i in range(len(data)):
     fig, ax = plt.subplots()
-    ax.set_title('3 Coupled Gen2dOscillators with GC={0:02f} and Noise={1:02f}'.format(float(data[i][0]), float(data[i][1])))
-    ax.set_xlabel('Time (ms)')
-    ax.set_ylabel('Value of Fast Variable (V)')
-    ax.plot(data[i][2])
-    ax.legend(['DLPFC', 'IPSc', 'V1'], loc='upper right')
+    ax.set_title('3 Coupled 2D-Oscillators with GC={0:02f} and Noise={1:02f}'.format(float(data[i][0]), float(data[i][1])), fontsize=10, fontname='Times New Roman', fontweight='bold')
+    ax.set_xlabel('Time (ms)', fontsize=8, fontname='Times New Roman', fontweight='bold')
+    ax.set_ylabel('Value of Fast Variable (V)', fontsize=8, fontname='Times New Roman', fontweight='bold')
+    ax.tick_params(axis='both', which='major', labelsize=7)
+    right_side = ax.spines["right"]
+    top_side = ax.spines["top"]
+    right_side.set_visible(False)
+    top_side.set_visible(False)
+    ax.plot(data[0][3], data[i][2], linewidth=0.4)  # hacked the time because time is cumulative in the plots
+    ax.axvspan(0, 500, alpha=0.5, color='grey')
+    ax.legend(['DLPFC', 'IPSc', 'V1'], loc='upper right', fontsize=6)
     plt.savefig(fileNameTemplate.format(float(data[i][0]), float(data[i][1])), format='svg')
     plt.clf()
+
+
 
 # TRYING TO CALCULATION
 # from statsmodels.tsa.stattools import adfuller
