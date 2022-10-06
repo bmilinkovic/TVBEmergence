@@ -42,7 +42,7 @@ nodeWeights = sio.loadmat(ssdiNW)                           # loads in the subsp
 nodeWeights = nodeWeights['maximalNodeWeights']              # selects the nweights dict. key.
 
 edgeFrame = pd.DataFrame(edgeWeights)
-subset = edgeFrame.loc[:, 582:584]
+subset = edgeFrame.loc[:, 1:3]
 subset.columns = ['IPCs', 'DLPFC', 'V1']
 subset.index = ['IPCs', 'DLPFC', 'V1']
 
@@ -102,14 +102,16 @@ fig = plt.figure(figsize=(20,10))
 gs = GridSpec(nrows=1, ncols=2)
 
 ax0 = fig.add_subplot(gs[0,0])
-ax0.set_title('Parameter Sweep across Grlobal Coupling and Noise')
-ax0.set_xaxis[]
-sns.heatmap(ddDataMatrix, cmap='bone_r')
+ax0.set_title('Parameter Sweep across Global Coupling and Noise')
+plt.xscale('log')
+plt.yscale('log')
+ax0 = sns.heatmap(ddDataMatrix, cmap='bone_r')
+ax0.invert_yaxis()
 
 ax1 = fig.add_subplot(gs[0,1])
 ax1.set_title('Node weighting across every optimisation run')
 sns.heatmap(nodeWeights, cmap='bone_r')
 
 fig.tight_layout()
-fig.savefig(ssdiFigures + "osc2d_3node_nodelay_a-0.7_ps_gc_noiselarger_parameterSweep_and_macroWeighting.svg")
+#fig.savefig(ssdiFigures + "osc2d_3node_nodelay_a-0.7_ps_gc_noiselarger_parameterSweep_and_macroWeighting.svg")
 fig.show()
