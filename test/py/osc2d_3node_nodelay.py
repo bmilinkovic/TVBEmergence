@@ -16,8 +16,8 @@ from itertools import product
 
 # Set the directories for saving figures and data
 resultsDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/'
-dataDir = os.path.join(resultsDir, 'osc2d_3node_UNCOUPLED_nodelay_a-1.0_ps_gc-noise/data/')
-figureDir = os.path.join(resultsDir, 'osc2d_3node_UNCOUPLED_nodelay_a-1.0_ps_gc-noise/figures/')
+dataDir = os.path.join(resultsDir, 'osc2d_3node_nodelay_a-0.7_ps_gc-noise-larger/data/')
+figureDir = os.path.join(resultsDir, 'osc2d_3node_nodelay_a-0.7_ps_gc-noise-larger/figures/')
 
 
 if not os.path.exists(figureDir):
@@ -31,8 +31,8 @@ if not os.path.exists(dataDir):
 surrogate_connectivity = connectivity.Connectivity(number_of_regions=3,
                                                    number_of_connections=9,
                                                    speed=np.array([sys.float_info.max]),
-                                                   weights=np.array([[0, 0, 0],
-                                                                     [0, 0, 0],
+                                                   weights=np.array([[0, 1, 0],
+                                                                     [1, 0, 0],
                                                                      [0, 0, 0]]),
                                                    tract_lengths=np.array([[0, 0, 0],
                                                                            [0, 0, 0],
@@ -50,7 +50,7 @@ ss_output_setting.configure()
 simulation = simulator.Simulator(connectivity=surrogate_connectivity,
                                  coupling=coupling.Linear(),
                                  integrator=integrators.HeunStochastic(dt=0.5, noise=noise.Additive()),
-                                 model=models.Generic2dOscillator(a=np.array([1.0]),
+                                 model=models.Generic2dOscillator(a=np.array([0.5]),
                                                                   b=np.array([-1.0]),
                                                                   c=np.array([0.0]),
                                                                   d=np.array([0.1]),
@@ -80,7 +80,7 @@ def run_sim(global_coupling, noise):
 #global_coupling = np.r_[0.3:0.7:0.1]
 global_coupling_log = 10**np.r_[-5:0:20j]
 #noise = np.r_[0:0.04:0.01]
-noise_log = 10**np.r_[-6:-2:20j]
+noise_log = 10**np.r_[-3:-0.002:20j]
 #conduction_speed = np.r_[0:21:5]
 
 data = []
@@ -97,7 +97,7 @@ for i in range(len(data)):
         sio.savemat(dataDir + 'osc2d_3node_nodelay_gc-{0:02f}_noise-{1:02f}.mat'.format(float(data[i][0]), float(data[i][1])), {'data': data[i][2]})
 
 
-fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/osc2d_3node_UNCOUPLED_nodelay_a-1.0_ps_gc-noise/figures/osc2d_3node_nodelay_gc-{0:02f}_noise-{1:02f}.svg'
+fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/osc2d_3node_nodelay_a-0.7_ps_gc-noise-larger/figures/osc2d_3node_nodelay_gc-{0:02f}_noise-{1:02f}.svg'
 for i in range(len(data)):
     fig, ax = plt.subplots()
     ax.set_title('3 Coupled 2D-Oscillators with GC={0:02f} and Noise={1:02f}'.format(float(data[i][0]), float(data[i][1])), fontsize=10, fontname='Times New Roman', fontweight='bold')

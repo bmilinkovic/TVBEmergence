@@ -123,6 +123,6 @@ fprintf('done\n\n');
 
 % !!! Now remember to convert Lo back to non-decorrelated coordinates !!!
 
-k = 1; wgraph2dot(nweight(:,k),eweight,gfile,[],gvprog);
+k = 2; wgraph2dot(nweight(:,k),eweight,gfile,[],gvprog);
 
 
