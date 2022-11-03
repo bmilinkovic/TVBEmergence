@@ -20,7 +20,7 @@
 % Then run preopt_dd_to_opt_dd.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-mdim = 2;
+mdim = 3;
 defvar('moddir',   tempdir     );  % model directory
 defvar('modname',  'gc_model' );  % model filename root
 defvar('poptdir',  tempdir     );  % pre-optimisation directory
@@ -103,6 +103,18 @@ if ~isempty(gpterm)
 end
 
 % Save pre-optimisation results
+
+
+preoptimisation_history = cell(1, length(ohistp));
+for i = 1:length(ohistp)  % -> numel(cellmatrix)
+preoptimisation_history{i}= ohistp{i,1}(:,1);   % change 1 to 7 if you want to extract 7th column
+end
+
+preoptimisationDataDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiDataMATLAB/preoptData';
+preoptimisationFile = fullfile(preoptimisationDataDir, ['preoptDD_mdim' num2str(mdim) '_plotting data.mat']);
+fprintf('\n **** saving pre-optimisation files for plotting in matplotlib: %s', preoptimisationFile);
+save(preoptimisationFile, 'preoptimisation_history', 'nitersp', 'goptp');
+fprintf('..Saved! \n\n');
 
 clear n m st et tcpu rstate gpplot gpterm gpscale gpfsize gptitle gpstem
 if histp

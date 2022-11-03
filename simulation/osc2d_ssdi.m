@@ -193,7 +193,7 @@ for fileNumber = 1:length(pwcgcFiles)
         nodeWeights{fileNumber}(:, k) = 1-gmetricsx(Lopto(:,:,k));
     end
 
-    dynamical_dependence(fileNumber) = max(dopto{fileNumber})
+    dynamical_dependence(fileNumber) = min(dopto{fileNumber})
 end
 
 

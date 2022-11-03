@@ -6,20 +6,20 @@
 %  Loading in a dataset that has been saved as a .mat file from the TVB
 %  simulation
 
-data_dir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/osc2d_3node_nodelay_a-0.5_ps_gc-noise/data';
-data_file = 'osc2d_3node_nodelay_gc-0.545559_noise-0.002336.mat'
+data_dir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/SJ3D_5node_nodelay_ps_gc-noise/data/';
+data_file = 'SJ3D_5node_nodelay_gc-0.043940_noise-0.001000.mat'
 
 %  Here set the datafile name to whichever file you wish to analyse. 
 load([data_dir filesep data_file]); 
 
-data = data'; % transpose data
+%data = data'; % transpose data onlly if it is not already in correct form
 data = data(:, 251:end) % get rid of the initial transience by splicing the first second of data. 
 
 %% SETTING VAR MODELLING PARAMETERS
 
 if ~exist('momax',      'var'), momax       = 20; end       % maximum model order
 if ~exist('moregmode',  'var'), moregmode   = 'LWR'; end    % model order regression mode 
-if ~exist('mosel',      'var'), mosel       = 'BIC'; end    % which model order to select
+if ~exist('mosel',      'var'), mosel       = 'AIC'; end    % which model order to select
 if ~exist('plotm',      'var'), plotm       = 0; end        % for plotting on seperate figures
 
 %% VAR MODELLING

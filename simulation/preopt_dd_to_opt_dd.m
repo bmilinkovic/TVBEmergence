@@ -104,13 +104,29 @@ end
 
 % distances from each subset to the n-macro 
 
-dist = 1 - gmetricsxx(Lopto(:,:,1));
-plucker_dist = plucker(Lopto(:,:,1), true);
+dist = 1 - gmetricsxx(Lopto(:,:,2));
+%plucker_dist = plucker(Lopto(:,:,1), true);
 gptitle = sprintf('Distances of Macro-Variable from Subset of MicroVariables');
 gpstem = fullfile(tempdir, 'opt_dist');
-gp_plucker(plucker_dist,3,2,gptitle,gpstem, gpterm, gpscale, gpfsize, gpplot)
+gp_plucker(dist,5,3,gptitle,gpstem, gpterm, gpscale, gpfsize, gpplot)
 
-clear n m st et tcpu gpplot gpterm gpscale gpfsize gptitle gpstem
+
+optimisation_history = cell(1, length(ohisto));
+for i = 1:length(ohisto)  % -> numel(cellmatrix)
+optimisation_history{i}= ohisto{i,1}(:,1);   % change 1 to 7 if you want to extract 7th column
+end
+
+
+
+    
+
+
+optimisationDataDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiDataMATLAB/optData';
+optimisationFile = fullfile(optimisationDataDir, ['optDD_mdim' num2str(mdim) '_plotting data.mat']);
+fprintf('\n **** saving pre-optimisation files for plotting in matplotlib: %s', optimisationFile);
+save(optimisationFile, 'optimisation_history', 'niterso', 'gopto', 'dopto', 'dist', 'nweight');
+fprintf('..Saved! \n\n');
+%clear n m st et tcpu gpplot gpterm gpscale gpfsize gptitle gpstem
 
 if histo
 	optfile = fullfile(optdir,[optname '_mdim_' num2str(mdim) '_H.mat']);
@@ -123,6 +139,6 @@ fprintf('done\n\n');
 
 % !!! Now remember to convert Lo back to non-decorrelated coordinates !!!
 
-k = 2; wgraph2dot(nweight(:,k),eweight,gfile,[],gvprog);
+k = 5; wgraph2dot(nweight(:,k),eweight,gfile,[],gvprog);
 
 
