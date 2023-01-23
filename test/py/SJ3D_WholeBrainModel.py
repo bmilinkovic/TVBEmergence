@@ -35,7 +35,7 @@ output_monitor = monitors.TemporalAverage(period=3.90625)      # 256 Hz
 simulation = simulator.Simulator(connectivity=conn,
                                  model=models.ReducedSetHindmarshRose(),
                                  coupling=coupling.Linear(),
-                                 integrator=integrators.HeunStochastic(dt=2**-7, noise=noise.Additive(nsig=np.array([0.327]))),
+                                 integrator=integrators.HeunStochastic(dt=2**-7, noise=noise.Additive(nsig=np.array([0.127]))),
                                  monitors=[output_monitor],
                                  simulation_length=4000)  # 7 minutes.
 simulation.configure()
@@ -47,10 +47,12 @@ def run_sim(global_coupling):
     results = simulation.run()
     time = results[0][0].squeeze()
     data = results[0][1].squeeze()
-    data_cleaned = np.zeros([len(conn.weights), np.size(data, 1)])  # initialise structure for z-scored data.
+    data_cleaned = np.zeros([76, 1024])  # initialise structure for z-scored data.
     for i in range(len(conn.weights)):
-        data_cleaned[i] = zscore(np.sum(data[:, 0, i, :], axis=1))
+        data_cleaned[i, :] = zscore(np.sum(data[:, 0, i, :], axis=1))
     return (global_coupling, data_cleaned, time)
+
+
 
 
 # with connectivity
@@ -70,7 +72,7 @@ fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/resul
 # Plotting for Connectivity
 
 fig, ax = plt.subplots()
-ax.set_title('5 Coupled SJ3D Models with GC={0:02f}'.format(float(dataConnectivity[0][0])), fontsize=10, fontname='Times New Roman', fontweight='bold')
+ax.set_title('Whole-brain with GC={0:02f}'.format(float(dataConnectivity[0][0])), fontsize=10, fontname='Times New Roman', fontweight='bold')
 ax.set_xlabel('Time (ms)', fontsize=8, fontname='Times New Roman', fontweight='bold')
 ax.set_ylabel('Local Field Potential (LFP)', fontsize=8, fontname='Times New Roman', fontweight='bold')
 ax.tick_params(axis='both', which='major', labelsize=7)

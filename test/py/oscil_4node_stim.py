@@ -55,7 +55,7 @@ ss_output_setting.configure()
 sim = simulator.Simulator(model=models.Generic2dOscillator(),
                           connectivity=conn,
                           coupling=coupling.Linear(a=np.array([0.6])),
-                          integrator=integrators.HeunStochastic(dt=0.5, noise=noise.Additive(nsig=np.array([2**-4]))),
+                          integrator=integrators.HeunStochastic(dt=2**-6, noise=noise.Additive(nsig=np.array([2**-4]))),
                           monitors=(ss_output_setting,),
                           stimulus=stimulus,
                           simulation_length=2000*57, # 2s of 56 trials minute simulation

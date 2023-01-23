@@ -14,7 +14,7 @@ Script written by Borjan Milinković, 2022
 %% SET ALL PARAMETERS FOR MVGC AND SSDI ANALYSIS HERE
 if ~exist('momax',      'var'), momax       = 20;       end         % maximum model order
 if ~exist('moregmode',  'var'), moregmode   = 'LWR';    end         % model order regression mode 
-if ~exist('mosel',      'var'), mosel       = 'BIC';    end         % which model order to select
+if ~exist('mosel',      'var'), mosel       = 'AIC';    end         % which model order to select
 if ~exist('plotm',      'var'), plotm       = 0;        end         % for plotting on seperate figures
 if ~exist('regmode',    'var'), regmode     = 'LWR';    end 
 if ~exist('stat',       'var'), stat        = 'F';      end
@@ -56,23 +56,29 @@ defvar('ppo',      false       ); % parallelise multiple runs?
 % Setting up the directory structure for saving files first
 
 resultsDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results';
-dataDir = [resultsDir '/ssdiDataMATLAB/osc2d_3node_nodelay_a-0.7_ps_gc-noise-larger/'];
-figuresDir = '/ssdiFiguresMATLAB/osc2d_3node_nodelay_a-0.7_ps_gc-noise-larger/';
-peroptimisationDir = [dataDir '/preopt_osc2d'];
+pwcgcDir = [resultsDir '/ssdiDataMATLAB/SJ3D_NOCONN_5node_withlink_ps_gc-noise/pwcgc/'];
+ssdiDataDir = [resultsDir '/ssdiDataMATLAB/SJ3D_NOCONN_5node_withlink_ps_gc-noise/ssdiData/'];
+figuresDir = '/ssdiFiguresMATLAB/SJ3D_NOCONN_5node_withlink_ps_gc-noise/';
 
-if exist([dataDir]) == 0
-    mkdir([dataDir])
+
+if exist([ssdiDataDir]) == 0
+    mkdir([ssdiDataDir])
+end
+
+
+if exist([pwcgcDir]) == 0
+    mkdir([pwcgcDir])
 end
 
 % Loading in TVB data.
 tvbDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results';
-oscDir = '/osc2d_3node_nodelay_a-0.7_ps_gc-noise-larger/';
+oscDir = '/SJ3D_NOCONN_5node_withlink_ps_gc-noise/';
 tvbDataDir = '/data';
 
 files = dir([tvbDir filesep oscDir filesep tvbDataDir filesep '*.mat']);
 
 
-edgeWeightsMatrix = zeros(3, 3, length(files));         % initialise pwcgc matrix                     
+edgeWeightsMatrix = zeros(5, 5, length(files));         % initialise pwcgc matrix                     
 
 for fileNumber = 1:length(files)
     filename = files(fileNumber).name;
@@ -80,12 +86,12 @@ for fileNumber = 1:length(files)
     
     
     tic;
-    fprintf('..Starting on %s (%g / %g) of Oscillator Dynamics\n', filename, fileNumber, length(files));
+    fprintf('..Starting on %s (%g / %g) of SJ3D Dynamics\n', filename, fileNumber, length(files));
     
     load([folder filesep filename]);        % load the data in
-    data = data';                           % if data needs to be transposed
+    %data = data';                           % if data needs to be transposed
     data = data(:, 251:end);                % remove first second of initial transients 
-    data = demean(data, true);              % demeaning data only if it has not been Z-scored in TVB sim.
+    %data = demean(data, true);              % demeaning data only if it has not been Z-scored in TVB sim.
     
     % MVGC Analysis
     
@@ -124,16 +130,17 @@ for fileNumber = 1:length(files)
     
     % Saving the MVGC variables that are necessary for SSDI estimates
     
-    modfile = sprintf([dataDir 'pwcgc_%s_%g-of-%g.mat'], filename(1:end-4), fileNumber, length(files));
+    modfile = sprintf([pwcgcDir 'pwcgc_%s_%g-of-%g.mat'], filename(1:end-4), fileNumber, length(files));
     fprintf('Saving PWCGC model ''%s''. ', modfile);
-    save(modfile, 'V', 'CAK', 'H');
+    save(modfile, 'V', 'CAK', 'H', 'Vss');
     fprintf('Saved..\n');
     toc;
 end
 
-mdim = 2;           % select macroscopic dimension
-pwcgcFiles = dir([dataDir filesep '*.mat']);
+mdim = 3;           % select macroscopic dimension
+pwcgcFiles = dir([pwcgcDir filesep '*.mat']);
 doptp = cell(1, length(pwcgcFiles));
+%index = zeros(1,225)
 
 for fileNumber = 1:length(pwcgcFiles)
     filename = pwcgcFiles(fileNumber).name;
@@ -148,7 +155,7 @@ for fileNumber = 1:length(pwcgcFiles)
     fres = size(H,3)-1;
     
     
-    fprintf('Beginning pre-optimisation for %d-macro on %g / %g Oscillator models\n',m, fileNumber, length(pwcgcFiles));
+    fprintf('Beginning pre-optimisation for %d-macro on %g / %g SJ3D models\n',m, fileNumber, length(pwcgcFiles));
     
     
     % Initialise the optimisation runs
@@ -187,48 +194,29 @@ for fileNumber = 1:length(pwcgcFiles)
         nodeWeights{fileNumber}(:, k) = 1-gmetricsx(Lopto(:,:,k));
     end
 
-    dynamical_dependence(fileNumber) = max(dopto{fileNumber})
+    dynamical_dependence(fileNumber) = min(dopto{fileNumber});
 end
 
 
 %% Saving data
-
 % Saving directories
-saveDirDD = [dataDir 'dynamical_dependence_parametersweep_noise_gc-noiselarger'];
-saveDirNodeWeights = [dataDir 'nodeWeights_parametersweep_noise_gc-noisellarger'];
-saveDirEdgeWeights = [dataDir 'edgeWeightsArray_parametersweep_noise_gc-nnoiselarger'];
+saveDirDD = [ssdiDataDir 'SJ3D_NOCONN_AIC_3MACRO_withlink_dynamical_dependence_parametersweep_noise_gc'];
+saveDirNodeWeights = [ssdiDataDir 'SJ3D_NOCONN_AIC_3MACRO_withlink_nodeWeights_parametersweep_noise_gc'];
+saveDirEdgeWeights = [ssdiDataDir 'SJ3D_NOCONN_AIC_3MACRO_withlink_edgeWeights_parametersweep_noise_gc'];
 
 % Dynamical Dependence Vector
 dynamical_independence_matrix = reshape(dynamical_dependence, [20,20]);
-dynamical_independence_matrix = dynamical_independence_matrix.'
+dynamical_independence_matrix = dynamical_independence_matrix.';
 save(saveDirDD, 'dynamical_independence_matrix');
 
 % Maximal Node Weights for each Simulation
 maximalNodeWeights=cell(1,length(nodeWeights));
-for i = 1:length(nodeWeights)  % -> numel(cellmatrix)
-maximalNodeWeights{i}= nodeWeights{i}(:,1);   % change 1 to 7 if you want to extract 7th column
-maximalNodeWeights = cell2mat(maximalNodeWeights);
+for i = 1:length(nodeWeights) % -> numel(cellmatrix)
+        maximalNodeWeights{i} = nodeWeights{1,i}(:,1);   % change 1 to 7 if you want to extract 7th column
 end
+maximalNodeWeights = cell2mat(maximalNodeWeights);
 save(saveDirNodeWeights, 'maximalNodeWeights');
 
 % Edge weights (GC-graph) for each simulation
-edgeWeights = reshape(edgeWeightsMatrix, [3,1200]);
+edgeWeights = reshape(edgeWeightsMatrix, [5, 2000]);  % the second digit is nodes x simulations
 save(saveDirEdgeWeights, 'edgeWeights');
-
-
-
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-

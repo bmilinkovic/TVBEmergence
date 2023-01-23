@@ -19,9 +19,9 @@ Preparation of results directory
 
 # Set the directories for saving figures and data
 resultsDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/'
-dataDir = os.path.join(resultsDir, 'SJ3D_NOCONN_5node_nodelay_ps_gc-noise/data/')
-figureDir = os.path.join(resultsDir, 'SJ3D_NOCONN_5node_nodelay_ps_gc-noise/figures/')
-connDir = os.path.join(resultsDir, 'SJ3D_NOCONN_5node_nodelay_ps_gc-noise/conn/')
+dataDir = os.path.join(resultsDir, 'SJ3D_NOCONN_5node_withlink_ps_gc-noise/data/')
+figureDir = os.path.join(resultsDir, 'SJ3D_NOCONN_5node_withlink_ps_gc-noise/figures/')
+connDir = os.path.join(resultsDir, 'SJ3D_NOCONN_5node_withlink_ps_gc-noise/conn/')
 
 if not os.path.exists(figureDir):
    os.makedirs(figureDir)
@@ -54,24 +54,25 @@ tracts_nodelay = np.array([[0, 0, 0, 0, 0],
                            [0, 0, 0, 0, 0],
                            [0, 0, 0, 0, 0]])
 
-subset_nodelay = connectivity.Connectivity(weights=changedWeights,
+subset = connectivity.Connectivity(weights=changedWeights,
                                            tract_lengths=default.tract_lengths[idx][:, idx],
                                            centres=default.centres[idx],
                                            region_labels=default.region_labels[idx])
-subset_nodelay.configure()
+subset.configure()
 
 
-connMatrixPlotter(subset_nodelay)
-plt.savefig('/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/SJ3D_NOCONN_5node_nodelay_ps_gc-noise/conn/SJ3D_NOCONN_5node_nodelay_gc.svg', format='svg')
+connMatrixPlotter(subset)
+plt.savefig('/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/SJ3D_NOCONN_5node_withlink_ps_gc-noise/conn/SJ3D_NOCONNN_5node_withlink_gc.svg', format='svg')
 plt.show()
 
-# %%
+
+# %% CONFIGURE THE SIMULATION
 
 # configure monitors
 monitors = monitors.TemporalAverage(period=3.90625)
 
 # configure simulation
-simulation = simulator.Simulator(connectivity=subset_nodelay,
+simulation = simulator.Simulator(connectivity=subset,
                                  coupling=coupling.Linear(),
                                  integrator=integrators.HeunStochastic(dt=2**-6,
                                                                        noise=noise.Additive()),
@@ -98,8 +99,8 @@ def run_sim(global_coupling, noise):
     return (global_coupling, noise, data_cleaned, time)
 
 
-global_coupling_log = 10**np.r_[-2:-0.5:15j]
-noise_log = 10**np.r_[-3:-0.002:15j]
+global_coupling_log = 10**np.r_[-2:-0.5:20j]
+noise_log = 10**np.r_[-3:-0.002:20j]
 
 data = []
 for (ai, bi) in list(product(*[global_coupling_log, noise_log])):
@@ -109,13 +110,13 @@ for (ai, bi) in list(product(*[global_coupling_log, noise_log])):
 # %% Save Data
 
 for i in range(len(data)):
-        sio.savemat(dataDir + 'SJ3D_NOCONN_5node_nodelay_gc-{0:02f}_noise-{1:02f}.mat'.format(float(data[i][0]), float(data[i][1])), {'data': data[i][2]})
+        sio.savemat(dataDir + 'SJ3D_NOCONN_5node_withlink_gc-{0:02f}_noise-{1:02f}.mat'.format(float(data[i][0]), float(data[i][1])), {'data': data[i][2]})
 
 
-fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/SJ3D_NOCONN_5node_nodelay_ps_gc-noise/figures/SJ3D_NOCONN_5node_nodelay_gc-{0:02f}_noise-{1:02f}.svg'
+fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/SJ3D_NOCONN_5node_withlink_ps_gc-noise/figures/SJ3D_NOCONN_5node_withlink_gc-{0:02f}_noise-{1:02f}.svg'
 for i in range(len(data)):
     fig, ax = plt.subplots()
-    ax.set_title('5 Uncoupled SJ3D Models with GC={0:02f} and Noise={1:02f}'.format(float(data[i][0]), float(data[i][1])), fontsize=10, fontname='Times New Roman', fontweight='bold')
+    ax.set_title('5 SJ3D Models with GC={0:02f} and Noise={1:02f}'.format(float(data[i][0]), float(data[i][1])), fontsize=10, fontname='Times New Roman', fontweight='bold')
     ax.set_xlabel('Time (ms)', fontsize=8, fontname='Times New Roman', fontweight='bold')
     ax.set_ylabel('Local Field Potential (LFP)', fontsize=8, fontname='Times New Roman', fontweight='bold')
     ax.tick_params(axis='both', which='major', labelsize=7)

@@ -49,11 +49,11 @@ stat, pval = ddstatMultivariate(coupled, uncoupled)
 
 
 fig, ax = plt.subplots(figsize=(20,10))
-plot = ax.bar(['rTCI', 'rA2', 'lM1', 'lTCC', 'rIP'], stat, color=['#008080'], edgecolor=['black'], alpha=0.7) # A bar chart
+plot = ax.bar([subset.region_labels, stat, color=['#008080'], edgecolor=['black'], alpha=0.7) # A bar chart
 ax.set_title('Wilcoxon Rank-sum Test: H0: Node is not significantly implicated in the dynamics of a 3-Macro in the '
              'coupled regime in comparison to the uncoupled regime ', fontsize=14, fontweight='bold', pad=10)
 ax.set_xlabel('Regions', fontsize=16, fontweight='bold', labelpad=10)
-ax.set_xticklabels(labels=['rTCI', 'rA2', 'lM1', 'lTCC', 'rIP'], fontdict={'fontsize': 12, 'fontweight': 'bold'})
+ax.set_xticklabels(labels=subset.region_labels, fontdict={'fontsize': 12, 'fontweight': 'bold'})
 ax.set_ylabel('Wilcoxon Rank-Sum Z-score', fontsize=16, fontweight='bold')
 ax.axhline(0, 0, color='black')
 
@@ -79,6 +79,6 @@ def autolabel(plot,  pval, xpos='center',):
         #             'p = {0:.02g}'.format(pval[i]), ha=ha[xpos], va='bottom')
 
 autolabel(plot, pval, "center")
-plt.savefig('/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiFiguresPython/stats/SJ3D_3macro_ranksum.svg')
+plt.savefig('/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiFiguresPython/stats/SJ3D_3macro_withlink_ranksum.svg')
 fig.show()
 

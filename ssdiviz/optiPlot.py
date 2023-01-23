@@ -14,7 +14,7 @@ import pandas as pd
 
 
 
-################################################################################
+#%%
 
 ssdiPreopt = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiDataMATLAB/preoptData'
 ssdiOpt = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiDataMATLAB/optData'

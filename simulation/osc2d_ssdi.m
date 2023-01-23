@@ -14,7 +14,7 @@ Script written by Borjan Milinković, 2022
 %% SET ALL PARAMETERS FOR MVGC AND SSDI ANALYSIS HERE
 if ~exist('momax',      'var'), momax       = 20;       end         % maximum model order
 if ~exist('moregmode',  'var'), moregmode   = 'LWR';    end         % model order regression mode 
-if ~exist('mosel',      'var'), mosel       = 'BIC';    end         % which model order to select
+if ~exist('mosel',      'var'), mosel       = 'AIC';    end         % which model order to select
 if ~exist('plotm',      'var'), plotm       = 0;        end         % for plotting on seperate figures
 if ~exist('regmode',    'var'), regmode     = 'LWR';    end 
 if ~exist('stat',       'var'), stat        = 'F';      end
@@ -56,9 +56,9 @@ defvar('ppo',      false       ); % parallelise multiple runs?
 % Setting up the directory structure for saving files first
 
 resultsDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results';
-pwcgcDir = [resultsDir '/ssdiDataMATLAB/osc2d_3node_nodelay_a-0.7_ps_gc-noise-larger/pwcgc/'];
-ssdiDataDir = [resultsDir '/ssdiDataMATLAB/osc2d_3node_nodelay_a-0.7_ps_gc-noise-larger/ssdiData/'];
-figuresDir = '/ssdiFiguresMATLAB/osc2d_3node_nodelay_a-0.7_ps_gc-noise-larger/';
+pwcgcDir = [resultsDir '/ssdiDataMATLAB/SJ3D_3node_withlink_ps_gc-noise/pwcgc/'];
+ssdiDataDir = [resultsDir '/ssdiDataMATLAB/SJ3D_3node_withlink_ps_gc-noise/ssdiData/'];
+figuresDir = '/ssdiFiguresMATLAB/SJ3D_3node_withlink_ps_gc-noise/';
 
 
 if exist([ssdiDataDir]) == 0
@@ -72,7 +72,7 @@ end
 
 % Loading in TVB data.
 tvbDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results';
-oscDir = '/osc2d_3node_nodelay_a-0.7_ps_gc-noise-larger/';
+oscDir = 'SJ3D_3node_withlink_ps_gc-noise';
 tvbDataDir = '/data';
 
 files = dir([tvbDir filesep oscDir filesep tvbDataDir filesep '*.mat']);
@@ -89,7 +89,7 @@ for fileNumber = 1:length(files)
     fprintf('..Starting on %s (%g / %g) of Oscillator Dynamics\n', filename, fileNumber, length(files));
     
     load([folder filesep filename]);        % load the data in
-    data = data';                           % if data needs to be transposed
+    %data = data';                           % if data needs to be transposed
     data = data(:, 251:end);                % remove first second of initial transients 
     data = demean(data, true);              % demeaning data only if it has not been Z-scored in TVB sim.
     
@@ -200,9 +200,9 @@ end
 %% Saving data
 
 % Saving directories
-saveDirDD = [ssdiDataDir 'dynamical_dependence_parametersweep_noise_gc-noiselarger'];
-saveDirNodeWeights = [ssdiDataDir 'nodeWeights_parametersweep_noise_gc-noiselarger'];
-saveDirEdgeWeights = [ssdiDataDir 'edgeWeights_parametersweep_noise_gc-noiselarger'];
+saveDirDD = [ssdiDataDir 'dynamical_dependence_parametersweep_noise_gc'];
+saveDirNodeWeights = [ssdiDataDir 'nodeWeights_parametersweep_noise_gc'];
+saveDirEdgeWeights = [ssdiDataDir 'edgeWeights_parametersweep_noise_gc'];
 
 % Dynamical Dependence Vector
 dynamical_independence_matrix = reshape(dynamical_dependence, [20,20]);
@@ -212,7 +212,7 @@ save(saveDirDD, 'dynamical_independence_matrix');
 % Maximal Node Weights for each Simulation
 maximalNodeWeights=cell(1,length(nodeWeights));
 for i = 1:length(nodeWeights)  % -> numel(cellmatrix)
-maximalNodeWeights{i}= nodeWeights{1,i}(:,1);   % change 1 to 7 if you want to extract 7th column
+    maximalNodeWeights{i}= nodeWeights{1,i}(:,1);   % change 1 to 7 if you want to extract 7th column
 end
 maximalNodeWeights = cell2mat(maximalNodeWeights);
 save(saveDirNodeWeights, 'maximalNodeWeights');
