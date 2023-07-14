@@ -22,9 +22,9 @@ dataDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/osc2d_n
 
 surrogate_connectivity = connectivity.Connectivity(number_of_regions=3,
                                                    number_of_connections=9,
-                                                   weights=np.array([[0, 1, 0],
-                                                                     [1, 0, 0],
-                                                                     [0, 0, 0]]),
+                                                   weights=np.array([[1, 2, 0],
+                                                                     [2, 1, 0],
+                                                                     [0, 0, 1]]),
                                                    tract_lengths=np.array([[0, 0, 0],
                                                                            [0, 0, 0],
                                                                            [0, 0, 0]]),

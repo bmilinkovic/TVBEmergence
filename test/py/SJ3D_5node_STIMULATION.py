@@ -1,3 +1,5 @@
+#%%
+
 import numpy as np
 import random
 from tvb.simulator.lab import *

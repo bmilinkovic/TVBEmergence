@@ -34,8 +34,8 @@ def ddstatMultivariate(x, y):
 nw_coupled_dir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiDataMATLAB/SJ3D_5node_nodelay_ps_gc-noise/ssdiData/'
 nw_uncoupled_dir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiDataMATLAB/SJ3D_NOCONN_5node_nodelay_ps_gc-noise/ssdiData/'
 
-nw_coupled_file = 'SJ3D_AIC_3MACRO_nodeWeights_parametersweep_noise_gc.mat'
-nw_uncoupled_file = 'SJ3D_NOCONN_AIC_3MACRO_nodeWeights_parametersweep_noise_gc.mat'
+nw_coupled_file = 'SJ3D_2MACRO_nodeWeights_parametersweep_noise_gc.mat'
+nw_uncoupled_file = 'SJ3D_NOCONN_AIC_2MACRO_nodeWeights_parametersweep_noise_gc.mat'
 
 nw_coupled = os.path.join(nw_coupled_dir, nw_coupled_file)
 nw_uncoupled = os.path.join(nw_uncoupled_dir, nw_uncoupled_file)
@@ -48,12 +48,11 @@ uncoupled = uncoupled['maximalNodeWeights']
 stat, pval = ddstatMultivariate(coupled, uncoupled)
 
 
-fig, ax = plt.subplots(figsize=(20,10))
-plot = ax.bar([subset.region_labels, stat, color=['#008080'], edgecolor=['black'], alpha=0.7) # A bar chart
-ax.set_title('Wilcoxon Rank-sum Test: H0: Node is not significantly implicated in the dynamics of a 3-Macro in the '
-             'coupled regime in comparison to the uncoupled regime ', fontsize=14, fontweight='bold', pad=10)
+fig, ax = plt.subplots(figsize=(15,8))
+plot = ax.bar([1,2,3,4,5], stat, color=['#008080'], edgecolor=['black'], alpha=0.7) # A bar chart
+ax.set_title('Wilcoxon Rank-sum Test for Implication in 3-macro (Control: uncoupled regime) ', fontsize=18, fontweight='bold', pad=10)
 ax.set_xlabel('Regions', fontsize=16, fontweight='bold', labelpad=10)
-ax.set_xticklabels(labels=subset.region_labels, fontdict={'fontsize': 12, 'fontweight': 'bold'})
+ax.set_xticklabels(labels=[[],'1','2','3','4','5'], fontdict={'fontsize': 14, 'fontweight': 'bold'})
 ax.set_ylabel('Wilcoxon Rank-Sum Z-score', fontsize=16, fontweight='bold')
 ax.axhline(0, 0, color='black')
 
@@ -73,12 +72,12 @@ def autolabel(plot,  pval, xpos='center',):
         height = rect.get_height()
         if pval[i] < 0.05:
             ax.text(rect.get_x() + rect.get_width()*offset[xpos], 1.01*height,
-                'p = {0:.02g}*'.format(pval[i]), ha=ha[xpos], va='bottom')
+                'p = {0:.02g}*'.format(pval[i]), ha=ha[xpos], va='bottom', fontsize=12, fontweight='bold')
         # else:
         #     ax.text(rect.get_x() + rect.get_width() * offset[xpos], 1.01 * height,
         #             'p = {0:.02g}'.format(pval[i]), ha=ha[xpos], va='bottom')
 
 autolabel(plot, pval, "center")
-plt.savefig('/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiFiguresPython/stats/SJ3D_3macro_withlink_ranksum.svg')
-fig.show()
+plt.savefig('/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiFiguresPython/stats/SJ3D_2macro_withlink_ranksum_new.eps')
+plt.show()
 

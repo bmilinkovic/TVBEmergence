@@ -16,16 +16,16 @@ import pandas as pd
 
 #%%
 
-ssdiPreopt = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiDataMATLAB/preoptData'
-ssdiOpt = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiDataMATLAB/optData'
+# ssdiPreopt = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiDataMATLAB/preoptData'
+# ssdiOpt = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/ssdiDataMATLAB/optData'
 
-ssdiOptfile = 'optDD_mdim3_plotting data.mat'
-ssdiPreoptfile = 'preoptDD_mdim3_plotting data.mat'
+# ssdiOptfile = 'optDD_mdim3_plotting data.mat'
+# ssdiPreoptfile = 'preoptDD_mdim3_plotting data.mat'
 
-preopt = sio.loadmat(os.path.join(ssdiPreopt, ssdiPreoptfile))
-preopthist = preopt['preoptimisation_history']
-opt = sio.loadmat(os.path.join(ssdiOpt, ssdiOptfile))
-opthist = opt['optimisation_history']
+# preopt = sio.loadmat(os.path.join(ssdiPreopt, ssdiPreoptfile))
+# preopthist = preopt['preoptimisation_history']
+# opt = sio.loadmat(os.path.join(ssdiOpt, ssdiOptfile))
+# opthist = opt['optimisation_history']
 
 
 

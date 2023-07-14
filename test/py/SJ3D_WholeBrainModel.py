@@ -7,10 +7,12 @@ import numpy as np
 import scipy.io as sio
 from scipy.stats import zscore
 from tvb.simulator.lab import *
-from utils.pyutils.connMatrixPlotter import connMatrixPlotter
+
+from utils.pyutils import connMatrixPlotter
+
 
 import matplotlib as mpl
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as pl
 import seaborn as sns
 
 
@@ -35,7 +37,7 @@ output_monitor = monitors.TemporalAverage(period=3.90625)      # 256 Hz
 simulation = simulator.Simulator(connectivity=conn,
                                  model=models.ReducedSetHindmarshRose(),
                                  coupling=coupling.Linear(),
-                                 integrator=integrators.HeunStochastic(dt=2**-7, noise=noise.Additive(nsig=np.array([0.127]))),
+                                 integrator=integrators.HeunStochastic(dt=2**-6, noise=noise.Additive(nsig=np.array([0.01]))),
                                  monitors=[output_monitor],
                                  simulation_length=4000)  # 7 minutes.
 simulation.configure()

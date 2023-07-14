@@ -9,18 +9,23 @@
 
 % to compute the synergy and redundancy for each region
 
-time_series = load('/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/SJ3D_3node_withlink_ps_gc-noise/data/SJ3D_3node_withlink_gc-0.263665_noise-0.232724.mat');
-time_series = time_series.data;
-
-source_data_dir = '/Volumes/dataSets/restEEGHealthySubjects/preprocessedData/sourceReconstructions/';
-files = dir([source_data_dir '*.mat']);
+% time_series = load('/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/SJ3D_3node_withlink_ps_gc-noise/data/SJ3D_3node_withlink_gc-0.263665_noise-0.232724.mat');
+% time_series = time_series.data;
+% 
+% source_data_dir = '/Volumes/dataSets/restEEGHealthySubjects/preprocessedData/sourceReconstructions/';
+% files = dir([source_data_dir '*.mat']);
 
 % this is code for loading in the data and constructing a time-series
 % properly for the synergistic and redundancy matrices. 
 
-time_series = load([source_data_dir files(2).name]); 
-time_series = permute(time_series.source_ts, [2,3,1]);
-time_series = time_series(:,:); %this is a good trip to concatenate trials into one continuous time series. 
+
+
+% time_series = load([source_data_dir files(2).name]); 
+% time_series = permute(time_series.source_ts, [2,3,1]);
+% time_series = time_series(:,:); %this is a good trip to concatenate trials into one continuous time series. 
+
+time_series = load('/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/SJ3D_3node_withlink_ps_gc-noise/data/SJ3D_3node_withlink_gc-0.106247_noise-0.002974.mat')
+time_series = time_series.data
 
 synergy_mat = zeros(size(time_series,1), size(time_series,1));
 redundancy_mat = zeros(size(time_series,1), size(time_series,1));
@@ -40,7 +45,7 @@ end
 
 % Save synergy and redundancy matrices
 
-phiid_dir = '/Users/borjanmilinkovic/Documents/gitdir/AnesthesiaProjectEmergence/results/phiid/data';
+phiid_dir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/';
 phiid_syn = '/wake_synergy_matrix';
 phiid_red = '/wake_redundancy_matrix';
 save([phiid_dir, phiid_syn], 'synergy_mat');
