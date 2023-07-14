@@ -68,7 +68,7 @@ def plot_dd(dd_values, macrosize):
     rows = 1
     cols = dd_values.shape[2]
 
-    gs = GridSpec(rows, cols, width_ratios=[1, 1, 1.2])  # <-- Add spacing between subplots and set equal width ratios
+    gs = GridSpec(rows, cols, width_ratios=[1, 1, 1, 1.2])  # <-- Add spacing between subplots and set equal width ratios
 
     cmap = sns.color_palette("YlOrBr", as_cmap=True)
 
@@ -79,7 +79,7 @@ def plot_dd(dd_values, macrosize):
     fig.text(0.5, 0.1, 'Noise', ha='center', fontsize=14, fontweight='bold')
 
     # Set a global y-axis label
-    fig.text(0.09, 0.5, 'Global Coupling', va='center', rotation='vertical', fontsize=14, fontweight='bold')
+    fig.text(0.07, 0.5, 'Global Coupling', va='center', rotation='vertical', fontsize=14, fontweight='bold')
 
     vmin = np.min(dd_values)
     vmax = np.max(dd_values)
@@ -96,11 +96,15 @@ def plot_dd(dd_values, macrosize):
         ax = sns.heatmap(node, cmap=cmap, vmin=vmin, vmax=vmax, cbar=i==cols-1, linecolor='black', linewidths=.6, square=True, cbar_kws={'shrink': 0.5, 'label': 'DD Value'})
         ax.set_xlabel('')
         ax.set_ylabel('')
-        ax.set_xticks(np.arange(len(noise)))
-        ax.set_yticks(np.arange(len(coupling)))
-        ax.set_xticklabels(noise, fontsize=8, rotation=45)
-        ax.set_yticklabels(coupling, fontsize=8, rotation=45)
+        ax.set_xticks(np.arange(0, len(noise)+1, 2))
+        ax.set_yticks(np.arange(0, len(coupling)+1, 2))
+        ax.set_xticklabels(noise[::2] + [noise[-1]], fontsize=14, rotation=45)
+        ax.set_yticklabels(coupling[::2] + [coupling[-1]], fontsize=14, rotation=45)
         ax.invert_yaxis()
+
+    cbar = ax.collections[0].colorbar  # Get the colorbar
+    cbar.ax.tick_params(labelsize=14)  # Set the tick label size
+    cbar.set_label('DD Values', fontsize=16)
 
     # Save the figure as PNG and EPS
     fig.savefig('dd_values_{}macro.png'.format(macrosize[i]), dpi=300, bbox_inches='tight')

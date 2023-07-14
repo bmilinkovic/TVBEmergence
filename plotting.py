@@ -11,27 +11,32 @@ from plots import ssdigraphs
 
 
 
+
 data_dir = 'results/ssdiDataMATLAB'
 files_dir = '/SJ3D_5node_withlink_ps_gc-noise/ssdiData/'
 
 data_list = []
-macrosize_list = []
-for filename in os.listdir(data_dir + files_dir):
+macrosize_character_array = []
+for filename in sorted(os.listdir(data_dir + files_dir)):
     if 'dynamical_dependence' in filename:
         f = sio.loadmat(os.path.join(data_dir + files_dir, filename))
         data = f['dynamical_independence_matrix']
         data_list.append(data)
         macrosize = int(filename.split('MACRO')[-2][-1])
-        macrosize_list.append(macrosize)
+        if 'NOCONN' in filename:
+            macrosize = 'NOCONN ' + str(macrosize)
+        else:
+            macrosize = str(macrosize)
+
+        macrosize_character_array.append(macrosize)
 
 data_array = np.dstack(data_list)
 df = pd.DataFrame(data_array.reshape(-1, data_array.shape[2]), columns=[f"file_{i}" for i in range(data_array.shape[2])])
-macrosize_array = np.array(macrosize_list)
+macrosize_array = np.array(macrosize_character_array)
 
 
 # # Plotting the dynamical dependence values
-
-ssdigraphs.plot_dd(data_array, [macrosize_array[i]])
+fig = ssdigraphs.plot_dd(data_array, macrosize_array)
 
 
 
