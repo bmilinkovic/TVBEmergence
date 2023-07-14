@@ -9,29 +9,13 @@ from matplotlib.gridspec import GridSpec
 import seaborn as sns
 import networkx as nx
 import pandas as pd
-#from matplotlib.ticker import FuncFormatter, LogLocator
+from scipy import stats
 
-# # Below: Loading in Edge weights
-# edgeWeights = sio.loadmat(ssdiSJ3DEW)                           # loads in edge weights as estimated by MVGC
-# edgeWeights = edgeWeights['edgeWeights']
-
-
-# # edgeFrame = pd.DataFrame(edgeWeights)
-# # subset = edgeFrame.loc[:, 10:14]
-# # subset.columns = ['rTCI', 'rA2', 'lM1', 'lTCC', 'rIP']
-# # subset.index = ['rTCI', 'rA2', 'lM1', 'lTCC', 'rIP']
-
-# # below is code too loop over all edge weights from the different parameter runs and can be used in below graphing loop.
-# edgeIndex = np.arange(0, 2001, 5)  # set the indices upon which to loop over. this requires you to know the step size
-# edgeWeightSubset = []               # is the size of the multivariate system of the number of nodes.
-# edgeWeightsSubset = edgeWeights[:, edgeIndex[i]:edgeIndex[i + 1]]
 
 def plot_macro_gc(edge_weights, node_weights, trials):
 
     for i in range(trials):            # the range is over the amount of simulations performed.
         subset = pd.DataFrame(edge_weights[:, edge_weights[i]:edge_weights[i+1]])
-        # subset.columns = ['0', '1', '2']
-        # subset.index = ['0','1','2']
         G = nx.from_pandas_adjacency(subset, create_using=nx.MultiDiGraph)
         G.remove_edges_from(list(nx.selfloop_edges(G)))                    # remove self edges
         edges, weights = zip(*nx.get_edge_attributes(G, 'weight').items()) # Extracts the edges and their corresponding weights into different tuples
@@ -65,65 +49,65 @@ def plot_macro_gc(edge_weights, node_weights, trials):
         return fig
 
 
-        # fig.tight_layout()
-        # #fig.savefig(ssdiFigures + "SJ3D_AIC_5node_nodelay_ps_gc-noise-nodeweights-{0}".format(int(134)))
-        # fig.savefig(ssdiFigures + "SJ3D_3node_withlink_2macro_GCMACROPLOT/SJ3D_3node_2MACRO_withlink_ps_gc-noise-nodeweights-{0}".format(int(i)))
-        # #fig.show()
-        # fig.clf()
 
+def plot_dd(dd_values, macrosize):
+    """
+    Plots the macro DD values in parameter space.
 
+    Args:
+        dd_values (numpy.ndarray): A 3D array of shape (n_coupling, n_noise, n_macro) containing the macro DD values.
+        macrosize (list): A list of integers indicating the number of nodes in each macro.
 
-
-def plot_dd_simulations(dynamical_dependence_values, macrosize):
-
-    edge_cmap = sns.color_palette("YlOrBr", as_cmap=True)
+    Returns:
+        matplotlib.figure.Figure: The resulting figure object.
+    """
 
     coupling = [str(round(float(x), 2)) for x in 10**np.r_[-2:-0.7:20j]]
     noise = [str(round(float(x), 3)) for x in 10**np.r_[-6:-1:20j]]
 
-    fig = plt.figure(figsize=(10, 10))
-    gs = GridSpec(nrows=1, ncols=1)
+    rows = 1
+    cols = dd_values.shape[2]
 
-    ax0 = fig.add_subplot(gs[0, 0])
-    ax0.set_title('Values of DD of {0}-macro for each parameter regime: \n (noise, coupling) across the parameter sweep'.format(macrosize), fontsize=14, fontweight='bold', pad=16)
-    ax0 = sns.heatmap(dynamical_dependence_values, cmap=edge_cmap, cbar_kws={'label': 'Dynamical Dependence Value'}, linecolor='black', linewidths=.6)
-    # ax0.set_xscale('log')
-    # ax0.set_yscale('log')
-    ax0.set_xlabel('Noise', fontsize=12, fontweight='bold', labelpad=10)
-    ax0.set_ylabel('Global Coupling', fontsize=12, fontweight='bold', labelpad=10)
+    gs = GridSpec(rows, cols, width_ratios=[1, 1, 1.2])  # <-- Add spacing between subplots and set equal width ratios
 
-    # def log_tick_formatter(val, pos=None):
-    #     """
-    #     Formatter function for logarithmic ticks.
-    #     """
-    #     # Find the nearest power of 10 to the tick value
-    #     power = int(np.floor(np.log10(val)))
+    cmap = sns.color_palette("YlOrBr", as_cmap=True)
 
-    #     # Calculate the logarithmic change
-    #     change = val / 10 ** power
+    fig = plt.figure(figsize=(cols*6.5, rows*8.0))  # <-- Adjust the size here
+    fig.suptitle("Macro DD values in parameter space", fontsize=16, fontweight="bold", y=0.90)
 
-    #     # Determine if the tick value is a power of 10
-    #     if change == 1:
-    #         # Return the power of 10 as the tick label
-    #         return fr'$10^{{{power}}}$'
-    #     else:
-    #         # Return an empty string for non-logarithmic changes
-    #         return ''
-    
-    #     # Set the x-axis tick locator and formatter
-    # ax0.xaxis.set_major_locator(LogLocator(subs='all'))
-    # ax0.xaxis.set_major_formatter(FuncFormatter(log_tick_formatter(noise)))
+    # Set a global x-axis label
+    fig.text(0.5, 0.1, 'Noise', ha='center', fontsize=14, fontweight='bold')
 
-    # Set the y-axis tick locator and formatter
-    # ax0.yaxis.set_major_locator(LogLocator(subs='all'))
-    # ax0.yaxis.set_major_formatter(FuncFormatter(log_tick_formatter(coupling)))
-    ax0.set_xticklabels(noise, fontsize=10, rotation=45)
-    ax0.set_yticklabels(coupling, fontsize=10, rotation=45)
-    ax0.invert_yaxis()
-    ax0.figure.axes[-1].yaxis.label.set_size(12)
+    # Set a global y-axis label
+    fig.text(0.09, 0.5, 'Global Coupling', va='center', rotation='vertical', fontsize=14, fontweight='bold')
 
+    vmin = np.min(dd_values)
+    vmax = np.max(dd_values)
+
+    cbar_ax = None  # Initialize colorbar axis
+
+    for i in range(dd_values.shape[2]):
+
+        node = pd.DataFrame(dd_values[:,:,i])
+        node.columns = [noise]
+        node.index = [coupling]
+        ax = fig.add_subplot(gs[i])
+        ax.set_title(f'{macrosize[i]}-macro', fontsize=14, fontweight='bold', pad=8)
+        ax = sns.heatmap(node, cmap=cmap, vmin=vmin, vmax=vmax, cbar=i==cols-1, linecolor='black', linewidths=.6, square=True, cbar_kws={'shrink': 0.5, 'label': 'DD Value'})
+        ax.set_xlabel('')
+        ax.set_ylabel('')
+        ax.set_xticks(np.arange(len(noise)))
+        ax.set_yticks(np.arange(len(coupling)))
+        ax.set_xticklabels(noise, fontsize=8, rotation=45)
+        ax.set_yticklabels(coupling, fontsize=8, rotation=45)
+        ax.invert_yaxis()
+
+    # Save the figure as PNG and EPS
+    fig.savefig('dd_values_{}macro.png'.format(macrosize[i]), dpi=300, bbox_inches='tight')
+    fig.savefig('dd_values_{}macro.eps'.format(macrosize[i]), format='eps', dpi=300, bbox_inches='tight')
+
+    plt.show()
     return fig
-
 
 
 def plot_nodeweights_all(node_weights, macrosize, regions = None):
