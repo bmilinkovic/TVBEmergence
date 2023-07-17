@@ -1,5 +1,6 @@
 import os
 import time
+import datetime
 
 import numpy as np
 import scipy.io as sio
@@ -321,6 +322,78 @@ def plot_opto(opthist, optdist):
     ax2.invert_yaxis()
 
     return fig
+
+
+def plot_connectivity(subset, show_figure=True):
+    """Plots structural connectivity and tracts matrix of 'network'.
+
+    Args:
+        subset (object): A `Subset` object containing the structural connectivity and tract lengths data.
+        show_figure (bool): A flag to indicate whether to display the figure or not. Default is True.
+
+    Returns:
+        None.
+
+    This function generates a figure with two subplots, one for the structural connectivity matrix and one for the tracts matrix.
+    The structural connectivity matrix shows the coupling strength between each pair of regions of interest (ROIs) in the network,
+    while the tracts matrix shows the distance (in millimeters) between each pair of ROIs. The ROIs are labeled on both axes of
+    each matrix. The matrices are generated using the `sns.heatmap` function from the Seaborn library, with a reversed "bone"
+    color palette. The matrices are also annotated with their respective values. The generated figure is saved in the
+    "../results/connectivity/" directory as both a PNG and an EPS file.
+
+    """
+
+    weights = subset.weights
+    tracts = subset.tract_lengths
+    regionLabels = subset.region_labels
+
+    f = plt.figure(figsize=(14, 6))
+    gs = f.add_gridspec(1, 2, wspace=0.35) # add wspace parameter to adjust horizontal space between the two axes
+
+    ax1 = f.add_subplot(gs[0, 0])
+    ax1.set_title('Weights Matrix', fontsize=22, fontweight='bold', pad=18)
+    cmap = mpl.cm.bone_r  # setting colour pallette to "bone" but reversed
+    weightsConn = sns.heatmap(weights.T, cmap=cmap,
+                          center=1.5, cbar_kws={'shrink': 0.6}, linewidths=.6, xticklabels=np.flip(regionLabels),
+                          yticklabels=regionLabels, annot=True, square=True, cbar=True)
+    weightsConn.set_xlabel('To (ROIs)', fontsize=18, labelpad=10, fontweight='bold')
+    weightsConn.set_ylabel('From (ROIs)', fontsize=18, labelpad=8, fontweight='bold')
+    weightsConn.tick_params(axis='both', which='major', labelsize=12) # added parameter for font size of xtick labels and ytick labels
+    cbar = weightsConn.collections[0].colorbar
+    cbar.ax.tick_params(labelsize=14) # set fontsize of colorbar ticks
+    cbar.set_ticks([0, 1, 2, 3]) # set colorbar ticks
+    cbar.set_label('Coupling Strength', fontsize=16) # set colorbar label
+    
+
+    ax2 = f.add_subplot(gs[0, 1])
+    ax2.set_title('Tracts Matrix', fontsize=22, fontweight='bold', pad=18)
+    cmap = mpl.cm.bone_r  # setting colour pallette to "bone" but reversed
+    tractsConn = sns.heatmap(tracts.T, cmap=cmap,
+                         center=np.max(tracts)/2, cbar_kws={'shrink': 0.6}, linewidths=.6, xticklabels=np.flip(regionLabels),
+                         yticklabels=regionLabels, annot=True, square=True)
+    tractsConn.set_xlabel('To (ROIs)', fontsize=18, labelpad=10, fontweight='bold')
+    tractsConn.set_ylabel('From (ROIs)', fontsize=18, labelpad=8, fontweight='bold')
+    tractsConn.tick_params(axis='both', which='major', labelsize=12) # added parameter for font size of xtick labels and ytick labels
+    cbar = tractsConn.collections[0].colorbar
+    cbar.ax.tick_params(labelsize=14) # set fontsize of colorbar ticks
+    cbar.set_label('Distance (mm)', fontsize=16) # set colorbar label
+
+    # create directory if it does not exist
+    if not os.path.exists("/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/connectivity/"):
+        os.makedirs("/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/connectivity/")
+
+    now = datetime.datetime.now() # <-- get current date and time
+    matrix_size = weights.shape # <-- get the size of the matrix
+
+    # Generate a unique identifier based on the matrix size and current date
+    identifier = f"{matrix_size[0]}x{matrix_size[1]}_{now.strftime('%Y-%m-%d_%H-%M-%S')}"
+
+    # Use the identifier in the file name
+    f.savefig(f"/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/connectivity/connectivity_{identifier}.png", dpi=300, bbox_inches='tight')
+    f.savefig(f"/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/connectivity/connMatrix_{identifier}.eps", format='eps', dpi=300, bbox_inches='tight')
+    
+    if show_figure:
+        plt.show()
 
 
 
