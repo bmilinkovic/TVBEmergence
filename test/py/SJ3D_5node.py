@@ -10,7 +10,11 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 from itertools import product
+import sys
+sys.path.append('/Users/borjan/code/python/TVBEmergence/')
 from utils.pyutils.connMatrixPlotter import connMatrixPlotter
+
+
 
 # %%
 '''

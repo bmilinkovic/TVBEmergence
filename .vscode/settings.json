@@ -1,3 +1,6 @@
 "terminal.integrated.env.windows": {
-    "PYTHONPATH": "${workspaceFolder}"
+  "PYTHONPATH": "${workspaceFolder};/Users/borjan/code/python/TVBEmergence/",
+    "python.autoComplete.extraPaths": [
+      "/Users/borjan/code/python/TVBEmergence/"
+  ]
   },
