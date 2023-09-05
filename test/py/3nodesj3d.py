@@ -6,13 +6,30 @@ import scipy as sc
 import scipy.io as sio
 from tvb.simulator.lab import *
 from scipy.stats import zscore
+import os
+
+
+# setting up the directories
+
+results_directory = './results/data/'
+
+if not os.path.exists(results_directory):
+    os.makedirs(results_directory)
 
 
 
 conn = connectivity.Connectivity()
 conn.centres_spherical(number_of_regions=3)
-conn.weights = np.array([[0,2,0], [1,0,-2], [1,0.5,0]])
-conn.tract_lengths = np.array([[0,8.8,0],[8.8,0,0], [0,0,0]])
+conn.weights = np.array([
+                            [0, 2, 0], 
+                            [1, 0, -2], 
+                            [1, 0.5, 0]
+])
+conn.tract_lengths = np.array([
+                                [0, 8.8, 0],
+                                [8.8, 0, 0], 
+                                [0, 0, 0]
+])
 conn.region_labels = np.array(['Cortex', 'Thalamus', 'Reticular T'])
 # conn = connectivity.Connectivity(weights = np.array([[0,2,0], [1,0,-2], [1,0.5,0]]),
 #                                  tract_lengths = np.array([[0,8.8,0],[8.8,0,0], [0,0,0]]),
@@ -23,14 +40,16 @@ conn.configure()
 
 # Plotting
 plot_matrix(conn.weights, connectivity=conn)
+plt.savefig(results_directory + 'weights.png')
 plt.show()
 
 plot_matrix(conn.tract_lengths, connectivity=conn)
+plt.savefig(results_directory + 'tract_lengths.png')
 plt.show()
 
 local_mod = models.ReducedSetHindmarshRose(K21 = np.array([0.5]), K12 = np.array([0.25]), mu= np.array([3.1]), sigma=np.array(0.5))
 coupling = coupling.Linear(a=np.array([0.5]))
-integ = integrators.HeunStochastic(dt=2**-1, noise=noise.Additive(nsig = np.array([0.44])))
+integ = integrators.HeunStochastic(dt=2**-6, noise=noise.Additive(nsig = np.array([0.44])))
 
 mon_raw = monitors.Raw()
 mon_subsample = monitors.SubSample(period=1)
@@ -85,8 +104,14 @@ ax2.plot(var2[0:5000], "tab:green")
 ax2.set_title('node2')
 ax3.plot(var3[0:5000], "tab:blue")
 ax3.set_title('node3')
+fig.savefig(results_directory + 'mean_field_activity.png')
 plt.show()
 
-sio.savemat('../results/data/3nodesj3d_1.mat', {'mvar': mvar})
+# saving the data as a matlab file
+filename = os.path.join(results_directory, "3nodeSJ3D_1.mat")
+sio.savemat(filename, {'mvar': mvar})
+
+
+
 
 
