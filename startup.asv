@@ -26,7 +26,7 @@ fprintf('[Emergence Pipeline startup] Added path to State-Space Dynamical Indpen
 
 
 global ceDir;
-ceDir = getenv('PHIID') 
+ceDir = getenv('PHIID'); 
 addpath(genpath(ceDir));
 fprintf('[Emergence Pipeline startup] Phi-ID toolbox intialised at: %s\n',ceDir);
 
