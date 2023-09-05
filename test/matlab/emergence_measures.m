@@ -24,7 +24,7 @@
 % time_series = permute(time_series.source_ts, [2,3,1]);
 % time_series = time_series(:,:); %this is a good trip to concatenate trials into one continuous time series. 
 
-time_series = load('/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/SJ3D_3node_withlink_ps_gc-noise/data/SJ3D_3node_withlink_gc-0.106247_noise-0.002974.mat')
+time_series = load('/Users/borjan/code/python/TVBEmergence/results/SJ3D_3node_withlink_ps_gc-noise/data/SJ3D_3node_withlink_gc-0.106247_noise-0.002974.mat')
 time_series = time_series.data
 
 synergy_mat = zeros(size(time_series,1), size(time_series,1));
@@ -45,7 +45,7 @@ end
 
 % Save synergy and redundancy matrices
 
-phiid_dir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/';
+phiid_dir = '/Users/borjan/code/python/TVBEmergence/results/';
 phiid_syn = '/wake_synergy_matrix';
 phiid_red = '/wake_redundancy_matrix';
 save([phiid_dir, phiid_syn], 'synergy_mat');
