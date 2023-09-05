@@ -26,9 +26,9 @@ fprintf('[Emergence Pipeline startup] Added path to State-Space Dynamical Indpen
 
 
 global ceDir;
-ceDir = '/Users/borjanmilinkovic/Documents/gitdir/ReconcilingEmergences';
+ceDir = getenv('phiid') 
 addpath(genpath(ceDir));
-fprintf('[Emergence Pipeline startup] Added path to Strong Causal Emergence toolbox: %s\n',ceDir);
+fprintf('[Emergence Pipeline startup] Phi-ID toolbox intialised at: %s\n',ceDir);
 
 
 
