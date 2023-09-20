@@ -33,7 +33,7 @@ conn.tract_lengths = np.array([
 conn.region_labels = np.array(['Cortex', 'Thalamus', 'Reticular T'])
 # conn = connectivity.Connectivity(weights = np.array([[0,2,0], [1,0,-2], [1,0.5,0]]),
 #                                  tract_lengths = np.array([[0,8.8,0],[8.8,0,0], [0,0,0]]),
-#                                  region_labels = np.array(['Cortex', 'Thalamus', 'Reticular T']))
+#                                region_labels = np.array(['Cortex', 'Thalamus', 'Reticular T']))
 
 conn.configure()
 

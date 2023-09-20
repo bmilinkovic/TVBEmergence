@@ -5,36 +5,36 @@ from scipy.stats import zscore
 import scipy.io as sio
 import pandas as pd
 import os
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 from itertools import product
-from utils.pyutils.connMatrixPlotter import connMatrixPlotter
+from plots.ssdigraphs import plot_connectivity
+import datetime
 
-# %%
-'''
-Preparation of results directory
-'''
-
-# Set the directories for saving figures and data
-resultsDir = '/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/'
-dataDir = os.path.join(resultsDir, 'SJ3D_3node_withlink_ps_gc-noise/data/')
-figureDir = os.path.join(resultsDir, 'SJ3D_3node_withlink_ps_gc-noise/figures/')
-connDir = os.path.join(resultsDir, 'SJ3D_3node_withlink_ps_gc-noise/conn/')
-
-if not os.path.exists(figureDir):
-   os.makedirs(figureDir)
-
-if not os.path.exists(dataDir):
-    os.makedirs(dataDir)
-
-if not os.path.exists(connDir):
-    os.makedirs(connDir)
+from multiprocessing import Pool, cpu_count, freeze_support
 
 
-# %%
-# connectivity
+
+# 1. SET THE DIRECTORIES FOR SAVING FIGURES AND DATA
+
+results_directory = './results/'
+
+if not os.path.exists(results_directory):
+    os.makedirs(results_directory)
+
+
+data_directory = os.path.join(results_directory, 'SJ3D_3node/data/')
+figure_directory = os.path.join(results_directory, 'SJ3D_3node/figures/')
+
+if not os.path.exists(figure_directory):
+   os.makedirs(figure_directory)
+
+if not os.path.exists(data_directory):
+    os.makedirs(data_directory)
+
+# 2. INITIALISE CONNECTIVITY AND COUPLING
+
 default = connectivity.Connectivity.from_file()
 default.configure()
 
@@ -57,12 +57,21 @@ subset = connectivity.Connectivity(weights=changedWeights,
 subset.configure()
 
 
-connMatrixPlotter(subset)
-plt.savefig('/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/SJ3D_3node_withlink_ps_gc-noise/conn/SJ3D_3node_withlink_gc.svg', format='svg')
-plt.tight_layout()
-plt.show()
+plot_connectivity(subset, show_figure=False)
+# plt.savefig(figure_directory + 'structural_connectivity.png')
 
-# %%
+
+now = datetime.datetime.now() # <-- get current date and time
+matrix_size = subset.weights.shape # <-- get the size of the matrix
+
+# Generate a unique identifier based on the matrix size and current date
+identifier = f"{matrix_size[0]}x{matrix_size[1]}_{now.strftime('%Y-%m-%d_%H-%M')}"
+
+# Use the identifier in the file name
+plt.savefig(f"{figure_directory}/connectivity_{identifier}.png", dpi=300, bbox_inches='tight')
+plt.savefig(f"{figure_directory}/connectivity_{identifier}.eps", format='eps', dpi=300, bbox_inches='tight')
+
+# 3. INITIALISE SIMULATOR
 
 # configure monitors
 monitors = monitors.TemporalAverage(period=3.90625)
@@ -95,24 +104,34 @@ def run_sim(global_coupling, noise):
     return (global_coupling, noise, data_cleaned, time)
 
 
-global_coupling_log = 10**np.r_[-2:-0.5:20j]
-noise_log = 10**np.r_[-3:-0.002:20j]
+global_coupling_log = 10**np.r_[-2:-0.02:25j]
+noise_log = 10**np.r_[-3:0.0:25j]
+
+# for sequential processing
+
+# data = []
+# for (ai, bi) in list(product(*[global_coupling_log, noise_log])):
+#     data.append(run_sim(np.array([ai]), np.array([bi])))
+
+# For multiprocessing
 
 data = []
-for (ai, bi) in list(product(*[global_coupling_log, noise_log])):
-    data.append(run_sim(np.array([ai]), np.array([bi])))
 
+if __name__ == '__main__': # <-- this is needed for multiprocessing to work
+    with Pool(processes=cpu_count()) as pool:
+        for result in pool.starmap(run_sim, [(np.array([ai]), np.array([bi])) for (ai, bi) in list(product(*[global_coupling_log, noise_log]))]):
+            data.append(result)
 
-# %% Save Data
+# 4. SAVE DATA AND PLOT FIGURES
 
 for i in range(len(data)):
-        sio.savemat(dataDir + 'SJ3D_3node_withlink_gc-{0:02f}_noise-{1:02f}.mat'.format(float(data[i][0]), float(data[i][1])), {'data': data[i][2]})
+        sio.savemat(data_directory + 'SJ3D_3node_withlink_gc-{0:02f}_noise-{1:02f}.mat'.format(float(data[i][0]), float(data[i][1])), {'data': data[i][2]})
 
 
-fileNameTemplate = r'/Users/borjanmilinkovic/Documents/gitdir/TVBEmergence/results/SJ3D_3node_withlink_ps_gc-noise/figures/SJ3D_3node_withlink_gc-{0:02f}_noise-{1:02f}.svg'
+# file_name_template = r'/Users/borjan/code/TVBEmergence/results/SJ3D_3node/figures/SJ3D_3node_gc-{0:02f}_noise-{1:02f}.svg'
 for i in range(len(data)):
     fig, ax = plt.subplots()
-    ax.set_title('3 SJ3D Models with GC={0:02f} and Noise={1:02f}'.format(float(data[i][0]), float(data[i][1])), fontsize=10, fontname='Times New Roman', fontweight='bold')
+    ax.set_title('3 coupled SJ3D NMMs with GC={0:02f} and Noise={1:02f}'.format(float(data[i][0]), float(data[i][1])), fontsize=10, fontname='Times New Roman', fontweight='bold')
     ax.set_xlabel('Time (ms)', fontsize=8, fontname='Times New Roman', fontweight='bold')
     ax.set_ylabel('Local Field Potential (LFP)', fontsize=8, fontname='Times New Roman', fontweight='bold')
     ax.tick_params(axis='both', which='major', labelsize=7)
@@ -122,11 +141,11 @@ for i in range(len(data)):
     top_side.set_visible(False)
     ax.plot(data[0][3], data[i][2].T, linewidth=0.4)  # hacked the time because time is cumulative in the plots
     ax.axvspan(0, 500, alpha=0.5, color='grey')
-    ax.legend(['Node[1]', 'Node[2]', 'Node[3]'], loc='upper right', fontsize=6)
-    plt.savefig(fileNameTemplate.format(float(data[i][0]), float(data[i][1])), format='svg')
+    ax.legend(subset.region_labels, loc='upper right', fontsize=6)
+    plt.savefig(f"{figure_directory}/SJ3D_3node_gc-{data[i][0]}_noise-{data[i][1]}.png", dpi=300, bbox_inches='tight')
+    plt.savefig(f"{figure_directory}/SJ3D_3node_gc-{data[i][0]}_noise-{data[i][1]}.eps", format='eps', dpi=300, bbox_inches='tight')
+    # plt.savefig(file_name_template.format(float(data[i][0]), float(data[i][1])), format='svg')
     plt.clf()
 
-
-#%%
-
-#from ssdiviz import ssdiviz_gcgraph
+ 
+                
