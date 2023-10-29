@@ -74,16 +74,16 @@ plt.savefig(f"{figure_directory}/connectivity_{identifier}.eps", format='eps', d
 # 3. INITIALISE SIMULATOR
 
 # configure monitors
-monitors = monitors.TemporalAverage(period=3.90625)
+monitors = monitors.TemporalAverage(period=3.90625) # <-- configure the temporal average monitor
 
 # configure simulation
-simulation = simulator.Simulator(connectivity=subset,
+simulation = simulator.Simulator(connectivity=subset, 
                                  coupling=coupling.Linear(),
                                  integrator=integrators.HeunStochastic(dt=2**-6,
                                                                        noise=noise.Additive()),
                                  monitors=[monitors],
                                  model=models.ReducedSetHindmarshRose(),
-                                 simulation_length=4000)
+                                 simulation_length=4000) 
 simulation.configure()
 
 # run_sim will run the simulation over a particular coupling range. Within the function it will also prepare the
@@ -91,21 +91,23 @@ simulation.configure()
 # excitatory population and will sum over the modes and then z-score each of the local dynamics independently before
 # constructing a structure with the entire time-series called _data_cleaned_. The data then needs to be transposed to
 # be plotted properly by matplotlib.
+
+
 def run_sim(global_coupling, noise):
-    simulation.coupling.a = global_coupling
-    simulation.integrator.noise.nsig = noise
-    print("Starting SJ3D simulation with coupling factor: " + str(global_coupling) + " and noise: " + str(noise))
-    results = simulation.run()
-    time = results[0][0].squeeze()
-    data = results[0][1].squeeze()
+    simulation.coupling.a = global_coupling # <-- set the coupling
+    simulation.integrator.noise.nsig = noise # <-- set the noise
+    print("Starting SJ3D simulation with coupling factor: " + str(global_coupling) + " and noise: " + str(noise)) # <-- print the coupling and noise
+    results = simulation.run() # <-- run the simulation
+    time = results[0][0].squeeze() # <-- extract the time
+    data = results[0][1].squeeze() # <-- extract the data
     data_cleaned = np.zeros([3, 1024])  # initialise structure for z-scored data.
-    for i in range(len(changedWeights)):
-        data_cleaned[i] = zscore(np.sum(data[:, 0, i, :], axis=1))
-    return (global_coupling, noise, data_cleaned, time)
+    for i in range(len(changedWeights)): # <-- loop over the number of nodes
+        data_cleaned[i] = zscore(np.sum(data[:, 0, i, :], axis=1)) # <-- z-score the data
+    return (global_coupling, noise, data_cleaned, time) # <-- return the coupling, noise, data and time
 
 
-global_coupling_log = 10**np.r_[-2:-0.02:25j]
-noise_log = 10**np.r_[-3:0.0:25j]
+global_coupling_log = 10**np.r_[-2:-0.02:25j] # <-- set the coupling range
+noise_log = 10**np.r_[-3:0.0:25j] # <-- set the noise range
 
 # for sequential processing
 
@@ -124,27 +126,29 @@ if __name__ == '__main__': # <-- this is needed for multiprocessing to work
 
 # 4. SAVE DATA AND PLOT FIGURES
 
+# save data
 for i in range(len(data)):
         sio.savemat(data_directory + 'SJ3D_3node_withlink_gc-{0:02f}_noise-{1:02f}.mat'.format(float(data[i][0]), float(data[i][1])), {'data': data[i][2]})
 
 
-# file_name_template = r'/Users/borjan/code/TVBEmergence/results/SJ3D_3node/figures/SJ3D_3node_gc-{0:02f}_noise-{1:02f}.svg'
+# plotting figures
 for i in range(len(data)):
     fig, ax = plt.subplots()
     ax.set_title('3 coupled SJ3D NMMs with GC={0:02f} and Noise={1:02f}'.format(float(data[i][0]), float(data[i][1])), fontsize=10, fontname='Times New Roman', fontweight='bold')
-    ax.set_xlabel('Time (ms)', fontsize=8, fontname='Times New Roman', fontweight='bold')
-    ax.set_ylabel('Local Field Potential (LFP)', fontsize=8, fontname='Times New Roman', fontweight='bold')
-    ax.tick_params(axis='both', which='major', labelsize=7)
-    right_side = ax.spines["right"]
-    top_side = ax.spines["top"]
-    right_side.set_visible(False)
-    top_side.set_visible(False)
-    ax.plot(data[0][3], data[i][2].T, linewidth=0.4)  # hacked the time because time is cumulative in the plots
-    ax.axvspan(0, 500, alpha=0.5, color='grey')
-    ax.legend(subset.region_labels, loc='upper right', fontsize=6)
-    plt.savefig(f"{figure_directory}/SJ3D_3node_gc-{data[i][0]}_noise-{data[i][1]}.png", dpi=300, bbox_inches='tight')
-    plt.savefig(f"{figure_directory}/SJ3D_3node_gc-{data[i][0]}_noise-{data[i][1]}.eps", format='eps', dpi=300, bbox_inches='tight')
-    # plt.savefig(file_name_template.format(float(data[i][0]), float(data[i][1])), format='svg')
+    ax.set_xlabel('Time (ms)', fontsize=8, fontname='Times New Roman', fontweight='bold') # <-- set the x-axis label
+    ax.set_ylabel('Local Field Potential (LFP)', fontsize=8, fontname='Times New Roman', fontweight='bold') # <-- set the y-axis label
+    ax.tick_params(axis='both', which='major', labelsize=7) # <-- set the tick label size
+    right_side = ax.spines["right"] # <-- remove the top and right spines
+    top_side = ax.spines["top"] # <-- remove the top and right spines
+    right_side.set_visible(False) # <-- remove the top and right spines
+    top_side.set_visible(False) # <-- remove the top and right spines
+    ax.plot(data[0][3], data[i][2].T + np.r_[:len(subset.weights)], linewidth=0.4)  # hacked the time because time is cumulative in the plots
+    ax.axvspan(0, 500, alpha=0.5, color='grey') # <-- this is the grey box
+    ax.legend(subset.region_labels, loc='upper right', fontsize=6) # <-- set the legend to be the region labels
+    ax.set_yticks(np.r_[:len(subset.weights)]) # <-- set the ticks to be at the middle of each region
+    ax.set_yticklabels(subset.region_labels) # <-- set the tick labels to be the region labels
+    plt.savefig(f"{figure_directory}/SJ3D_3node_gc-{data[i][0]}_noise-{data[i][1]}.png", dpi=300, bbox_inches='tight') # <-- save the figure
+    plt.savefig(f"{figure_directory}/SJ3D_3node_gc-{data[i][0]}_noise-{data[i][1]}.eps", format='eps', dpi=300, bbox_inches='tight') # <-- save the figure
     plt.clf()
 
  

@@ -440,4 +440,19 @@ def plot_wholebrain_connectivity(subset, show_figure=True, annot=False):
     if show_figure:
         plt.show()
 
+def plot_dd_violin(dd_values, macro_sizes, title):
+    data_dict = {}
+    for i, macro_size in enumerate(macro_sizes):
+        data_dict[macro_size] = dd_values[macro_size]
+    
+    data = [data_dict[macro_size] for macro_size in macro_sizes]
+    
+    fig, ax = plt.subplots()
+    ax.violinplot(data)
+    ax.set_xticks(range(1, len(macro_sizes) + 1))
+    ax.set_xticklabels([f"{i+1}: {macro_size}" for i, macro_size in enumerate(macro_sizes)])
+    ax.set_ylabel("Dynamical Dependence")
+    ax.set_title(title)
+    
+    return fig, ax
 
