@@ -356,7 +356,7 @@ def plot_connectivity(subset, show_figure=True, annot=False):
     cmap = mpl.cm.bone_r  # setting colour pallette to "bone" but reversed
     weightsConn = sns.heatmap(weights.T, cmap=cmap,
                           center=1.5, cbar_kws={'shrink': 0.6}, linewidths=.6, xticklabels=np.flip(regionLabels),
-                          yticklabels=regionLabels, annot=annot, square=True, cbar=True)
+                          yticklabels=np.flip(regionLabels), annot=annot, square=True, cbar=True)
     weightsConn.set_xlabel('To (ROIs)', fontsize=18, labelpad=10, fontweight='bold')
     weightsConn.set_ylabel('From (ROIs)', fontsize=18, labelpad=8, fontweight='bold')
     weightsConn.tick_params(axis='both', which='major', labelsize=12) # added parameter for font size of xtick labels and ytick labels
@@ -371,7 +371,7 @@ def plot_connectivity(subset, show_figure=True, annot=False):
     cmap = mpl.cm.bone_r  # setting colour pallette to "bone" but reversed
     tractsConn = sns.heatmap(tracts.T, cmap=cmap,
                          center=np.max(tracts)/2, cbar_kws={'shrink': 0.6}, linewidths=.6, xticklabels=np.flip(regionLabels),
-                         yticklabels=regionLabels, annot=annot, square=True)
+                         yticklabels=np.flip(regionLabels), annot=annot, square=True)
     tractsConn.set_xlabel('To (ROIs)', fontsize=18, labelpad=10, fontweight='bold')
     tractsConn.set_ylabel('From (ROIs)', fontsize=18, labelpad=8, fontweight='bold')
     tractsConn.tick_params(axis='both', which='major', labelsize=12) # added parameter for font size of xtick labels and ytick labels
@@ -456,3 +456,43 @@ def plot_dd_violin(dd_values, macro_sizes, title):
     
     return fig, ax
 
+
+
+def plot_phiid_matrix(phiid_matrix, filename, show_figure=True, annot=False):
+    """
+    Plots structural connectivity and tracts matrix of 'network'.
+
+    Args:
+        synergy_matrix (np.ndarray): A 2D numpy array containing the synergy matrix data.
+        filename (str): The name of the file to save the figure.
+        show_figure (bool): A flag to indicate whether to display the figure or not. Default is True.
+        annot (bool): A flag to indicate whether to annotate the heatmap or not. Default is False.
+
+    Returns:
+        None.
+
+    This function generates a figure with the synergy matrix.
+    The matrix is generated using the `sns.heatmap` function from the Seaborn library, with a reversed "bone"
+    color palette. The matrix is also annotated with its respective values if `annot` is True. The generated figure is saved in the
+    "../results/connectivity/" directory as both a PNG and an EPS file.
+
+    """
+    title = filename[:6]
+    f = plt.figure(figsize=(19.6, 8.4)) # increase width and height by 40%
+    gs = f.add_gridspec(1, 1, wspace=0.35) # add wspace parameter to adjust horizontal space between the two axes
+
+    ax1 = f.add_subplot(gs[0, 0])
+    ax1.set_title(title, fontsize=22, fontweight='bold', pad=18)
+    cmap = 'Greens'  # setting colour pallette to "Greens"
+    synergyConn = sns.heatmap(phiid_matrix, cmap=cmap,
+                          center=.5, cbar_kws={'shrink': 0.6}, linewidths=.6,
+                          annot=annot, square=True, cbar=True)
+    synergyConn.invert_yaxis() # invert y-axis
+    synergyConn.tick_params(axis='both', which='major', labelsize=12) # added parameter for font size of xtick labels and ytick labels
+    cbar = synergyConn.collections[0].colorbar
+    cbar.ax.tick_params(labelsize=14) # set fontsize of colorbar ticks
+    cbar.set_ticks([0, 1]) # set colorbar ticks
+    cbar.set_label('RTR information', fontsize=16) # set colorbar label
+    
+    if show_figure:
+        plt.show()
