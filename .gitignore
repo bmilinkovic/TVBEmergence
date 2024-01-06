@@ -3,3 +3,7 @@
 results/
 deprecated/
 tvb_data/
+*.png
+*.svg
+*.eps
+

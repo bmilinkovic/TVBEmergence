@@ -354,9 +354,9 @@ def plot_connectivity(subset, show_figure=True, annot=False):
     ax1 = f.add_subplot(gs[0, 0])
     ax1.set_title('Weights Matrix', fontsize=22, fontweight='bold', pad=18)
     cmap = mpl.cm.bone_r  # setting colour pallette to "bone" but reversed
-    weightsConn = sns.heatmap(weights.T, cmap=cmap,
-                          center=1.5, cbar_kws={'shrink': 0.6}, linewidths=.6, xticklabels=np.flip(regionLabels),
-                          yticklabels=np.flip(regionLabels), annot=annot, square=True, cbar=True)
+    weightsConn = sns.heatmap(weights, cmap=cmap,
+                          center=1.5, cbar_kws={'shrink': 0.6}, linewidths=.6, xticklabels=np.arange(1, len(regionLabels)+1),
+                          yticklabels=np.arange(1, len(regionLabels)+1), annot=annot, square=True, cbar=True)
     weightsConn.set_xlabel('To (ROIs)', fontsize=18, labelpad=10, fontweight='bold')
     weightsConn.set_ylabel('From (ROIs)', fontsize=18, labelpad=8, fontweight='bold')
     weightsConn.tick_params(axis='both', which='major', labelsize=12) # added parameter for font size of xtick labels and ytick labels
@@ -364,20 +364,21 @@ def plot_connectivity(subset, show_figure=True, annot=False):
     cbar.ax.tick_params(labelsize=14) # set fontsize of colorbar ticks
     cbar.set_ticks([0, 1, 2, 3]) # set colorbar ticks
     cbar.set_label('Coupling Strength', fontsize=16) # set colorbar label
-    
+    weightsConn.invert_yaxis()  # Flip the y-axis
 
     ax2 = f.add_subplot(gs[0, 1])
     ax2.set_title('Tracts Matrix', fontsize=22, fontweight='bold', pad=18)
     cmap = mpl.cm.bone_r  # setting colour pallette to "bone" but reversed
-    tractsConn = sns.heatmap(tracts.T, cmap=cmap,
-                         center=np.max(tracts)/2, cbar_kws={'shrink': 0.6}, linewidths=.6, xticklabels=np.flip(regionLabels),
-                         yticklabels=np.flip(regionLabels), annot=annot, square=True)
+    tractsConn = sns.heatmap(tracts, cmap=cmap,
+                         center=np.max(tracts)/2, cbar_kws={'shrink': 0.6}, linewidths=.6, xticklabels=np.arange(1, len(regionLabels)+1),
+                         yticklabels=np.arange(1, len(regionLabels)+1), annot=annot, square=True)
     tractsConn.set_xlabel('To (ROIs)', fontsize=18, labelpad=10, fontweight='bold')
     tractsConn.set_ylabel('From (ROIs)', fontsize=18, labelpad=8, fontweight='bold')
     tractsConn.tick_params(axis='both', which='major', labelsize=12) # added parameter for font size of xtick labels and ytick labels
     cbar = tractsConn.collections[0].colorbar
     cbar.ax.tick_params(labelsize=14) # set fontsize of colorbar ticks
     cbar.set_label('Distance (mm)', fontsize=16) # set colorbar label
+    tractsConn.invert_yaxis()  # Flip the y-axis
     
     if show_figure:
         plt.show()

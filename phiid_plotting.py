@@ -22,26 +22,38 @@ if not os.path.exists(figure_results):
 files = os.listdir(data)
 
 # Filter the list to only include files with 'sts' in the filename
-filtered_files = [f for f in files if 'sts' in f]
+filtered_files = [f for f in files if 'rtr' in f]
 
-# Load the datafiles
+#%% Load the datafiles
 for f in filtered_files:
-    filepath = os.path.join(data, f)
+    data_path = os.path.join(data, f)
 
     # Load the MATLAB data file
-    mat_data = sio.loadmat(filepath)
+    mat_data = sio.loadmat(data_path)
 
     # Access the data using the variable names in the MATLAB file
-    data = mat_data['sts_mat']
+    data_matrix = mat_data['rtr_mat']
+    data_matrix = data_matrix / np.max(np.abs(data_matrix))
     
     # Extract the filename from the filtered_files list
     #filename = f.split('.')[0]
 
     # Plot the sts matrix with the filename as the title
-    fig = plot_phiid_matrix(data, f)
-
-    plt.savefig(os.path.join(figure_results, filename + '.png'))
+    plot_phiid_matrix(data_matrix, f, show_figure=False)
+    plt.savefig(os.path.join(figure_results, f[:-4] + '.png'))
     
+# %% plot group averaged connectivity matrices
+all_conn = []
+for file in files:
+    if 'W' in file and 'rtr' in file:
+        mat_data = sio.loadmat(os.path.join(data, file))
+        data_matrix = mat_data['rtr_mat']
+        data_matrix = data_matrix / np.max(np.abs(data_matrix))
+        all_conn.append(data_matrix)
 
+avg_matrix = np.average(all_conn, axis=0)
+np.save('wake_rtr_avg_matrix.npy', avg_matrix)
 
+fig = plot_phiid_matrix(avg_matrix, 'Wake Averaged Red-to-Red matrix')
+plt.savefig(os.path.join(figure_results, 'Wake_averaged_rtr' + '.png'))
 # %%

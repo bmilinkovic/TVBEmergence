@@ -55,19 +55,14 @@ defvar('ppo',      false       ); % parallelise multiple runs?
 
 % Setting up the directory structure for saving files first
 
-sim_data_dir = '/Users/borjan/code/python/TVBEmergence/results/SJ3D_3node/data/'; % the directory where the simulations from python are stored
+sim_data_dir = '/Users/borjan/code/python/TVBEmergence/results/SJ3D_3node/'; % the directory where the simulations from python are stored
 
 % separate directories in which to save the results of the following
 % analysis
 ssdi_data_dir = '/Users/borjan/code/python/TVBEmergence/results/ssdi_sim_results/';
-pwcgc_data_dir = '/Users/borjan/code/python/TVBEmergence/results/ssdi_sim_results/pwcgc/';
 
 if ~exist(ssdi_data_dir, 'dir')
     mkdir(ssdi_data_dir);
-end
-
-if ~exist(pwcgc_data_dir, 'dir')
-    mkdir(pwcgc_data_dir);
 end
 
 
@@ -79,7 +74,7 @@ sim_files = dir([sim_data_dir '*.mat']);
 edgeWeightsMatrix = zeros(2, 2, length(sim_files));         % initialise pwcgc matrix                     
 
 for file_idx = 1:length(sim_files)
-    time_series = load([sim_data_dir sim_files(file_idx).name]);
+    time_series = load([ssdi_data_dir sim_files(file_idx).name]);
     time_series = time_series.data;
     time_series = time_series(:, 251:end);
 
@@ -128,15 +123,15 @@ for file_idx = 1:length(sim_files)
     
     % Saving the MVGC variables that are necessary for SSDI estimates
     
-    modfile = sprintf([pwcgc_data_dir 'pwcgc_%s_%g-of-%g.mat'], sim_files(file_idx).name(1:end-4), file_idx, length(sim_files));
+    modfile = sprintf([pwcgcDir 'pwcgc_%s_%g-of-%g.mat'], sim_files(file_idx).name(1:end-4), file_idx, length(sim_files));
     fprintf('Saving PWCGC model ''%s''. ', modfile);
     save(modfile, 'V', 'CAK', 'H', 'Vss');
     fprintf('Saved..\n');
     toc;
 end
 
-mdim = 2;           % select macroscopic dimension
-pwcgcFiles = dir([pwcgc_data_dir filesep '*.mat']);
+mdim = 3;           % select macroscopic dimension
+pwcgcFiles = dir([pwcgcDir filesep '*.mat']);
 doptp = cell(1, length(pwcgcFiles));
 %index = zeros(1,225)
 
@@ -153,7 +148,7 @@ for fileNumber = 1:length(pwcgcFiles)
     fres = size(H,3)-1;
     
     
-    fprintf('Beginning pre-optimisation for %d-macro on %g / %g SJ3D models\n', m, fileNumber, length(pwcgcFiles));
+    fprintf('Beginning pre-optimisation for %d-macro on %g / %g SJ3D models\n',m, fileNumber, length(pwcgcFiles));
     
     
     % Initialise the optimisation runs
@@ -198,9 +193,9 @@ end
 
 %% Saving data
 % Saving directories
-saveDirDD = [ssdi_data_dir 'SJ3D_3node'];
-saveDirNodeWeights = [ssdi_data_dir 'SJ3D_3node'];
-saveDirEdgeWeights = [ssdi_data_dir 'SJ3D_3node'];
+saveDirDD = [ssdiDataDir 'SJ3D_NOCONN_AIC_3MACRO_withlink_dynamical_dependence_parametersweep_noise_gc'];
+saveDirNodeWeights = [ssdiDataDir 'SJ3D_NOCONN_AIC_3MACRO_withlink_nodeWeights_parametersweep_noise_gc'];
+saveDirEdgeWeights = [ssdiDataDir 'SJ3D_NOCONN_AIC_3MACRO_withlink_edgeWeights_parametersweep_noise_gc'];
 
 % Dynamical Dependence Vector
 dynamical_independence_matrix = reshape(dynamical_dependence, [20,20]);
