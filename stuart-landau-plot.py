@@ -18,7 +18,7 @@ def euler_integrate(func, initial_condition, t_values, args=()):
         z = z + dt * func(z, t, *args)
         result.append(z)
     return np.array(result)
-
+# this code still needs to be fixed:
 # Parameters
 alpha = 0.1
 omega = 1.0

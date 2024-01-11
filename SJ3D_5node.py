@@ -2,7 +2,7 @@
 import numpy as np
 import random
 from tvb.simulator.lab import *
-#from tvb.analyzers import compute_proxy_metastability
+
 
 from scipy.stats import zscore
 import scipy.io as sio
@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 from itertools import product
 
 from plots.ssdigraphs import plot_connectivity
+import scikitlearn
 
 
 #%% 1. SET THE DIRECTORIES FOR SAVING FIGURES AND DATA

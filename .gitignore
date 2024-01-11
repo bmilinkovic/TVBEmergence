@@ -6,4 +6,5 @@ tvb_data/
 *.png
 *.svg
 *.eps
+*.npy
 
