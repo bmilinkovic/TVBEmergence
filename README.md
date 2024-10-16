@@ -1,14 +1,18 @@
 ## TVB Emergence
 
-This code utilises an integration between Python and MATLAB code. 
+This code integrates Python and MATLAB to simulate and analyze large-scale brain network models.
 
-The Virtual Brain (TVB) platform is used to simulated large-scale brain network models utilising a variety of neural mass models.
+	•	The Virtual Brain (TVB) platform is used to simulate biophysical neural models at the macroscopic scale, employing various neural mass models.
+	•	The Python code interfaces with MATLAB to run state-space Dynamical Independence (DI) analysis, identifying macroscopic variables from Granger-causal graphs.
 
-Then, the python code is piped to MATLAB commands that run state-space dynamical independence to discover macroscopic variables from (G-)causal graphs.
+Dependencies
 
-Importantly, it has several dependencies:
+This project requires the following toolboxes:
+	•	Multivariate Granger Causality Toolbox (MVGC) by Barnett & Seth (2014):
+Available at: https://github.com/lcbarnett/MVGC2
+	•	State-space Dynamical Independence Toolbox (SSDI) by Barnett (2021):
+Available at: https://github.com/lcbarnett/ssdi
+	•	The Virtual Brain (TVB) for neural model simulations:
+Available at: https://www.thevirtualbrain.org
 
-1. Multivariate Granger Causality Toolbox (Barnett & Seth, 2014)
-2. State-space Dynamical Independence Toolbox (Barnett, 2021)
-3. gpmat:
-4. gvmat:
+For details on installation and usage, please refer to the respective toolbox repositories.
